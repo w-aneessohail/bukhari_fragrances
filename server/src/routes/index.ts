@@ -9,6 +9,8 @@ import wishlistRoutes from "./wishlist.routes.js";
 import orderRoutes from "./order.routes.js";
 import contactRoutes from "./contact.routes.js";
 import adminRoutes from "./admin.routes.js";
+import userRoutes from "./user.routes.js";
+import blogRoutes from "./blog.routes.js";
 
 const router = Router();
 
@@ -21,6 +23,8 @@ router.use("/wishlist", wishlistRoutes);
 router.use("/orders", orderRoutes);
 router.use("/contact", contactRoutes);
 router.use("/admin", adminRoutes);
+router.use("/users", userRoutes);
+router.use("/blog", blogRoutes);
 
 router.get("/health", (_req, res) => {
   res.json(

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import AddressManager from "../../components/profile/AddressManager";
+import ChangePasswordForm from "../../components/profile/ChangePasswordForm";
 import { useAuthStore } from "../../store/authStore";
 
-const tabs = ["Personal Info", "Orders", "Loyalty"] as const;
+const tabs = ["Personal Info", "Addresses", "Orders", "Security"] as const;
 
 export default function ProfilePage() {
   const user = useAuthStore((state) => state.user);
@@ -41,10 +43,14 @@ export default function ProfilePage() {
             </div>
             <div>
               <dt className="text-text-secondary">Account type</dt>
-              <dd className="mt-1 capitalize text-text-primary">{user?.role?.toLowerCase().replace(/_/g, " ") ?? "—"}</dd>
+              <dd className="mt-1 capitalize text-text-primary">
+                {user?.role?.toLowerCase().replace(/_/g, " ") ?? "—"}
+              </dd>
             </div>
           </dl>
         ) : null}
+
+        {activeTab === "Addresses" ? <AddressManager /> : null}
 
         {activeTab === "Orders" ? (
           <div>
@@ -55,11 +61,7 @@ export default function ProfilePage() {
           </div>
         ) : null}
 
-        {activeTab === "Loyalty" ? (
-          <p className="text-text-secondary">
-            Loyalty rewards are coming soon. Earn points on every purchase and redeem exclusive offers.
-          </p>
-        ) : null}
+        {activeTab === "Security" ? <ChangePasswordForm /> : null}
       </div>
     </section>
   );

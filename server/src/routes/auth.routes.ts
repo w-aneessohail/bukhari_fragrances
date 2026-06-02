@@ -14,6 +14,7 @@ import {
   resetPasswordController,
   verifyEmailController
 } from "../controllers/auth.controller.js";
+import { getMe } from "../controllers/user.controller.js";
 
 const router = Router();
 
@@ -55,6 +56,7 @@ router.get(
   asyncHandler(googleCallback)
 );
 router.post("/refresh", asyncHandler(refresh));
+router.get("/me", verifyAccessToken, asyncHandler(getMe));
 router.post("/logout", verifyAccessToken, asyncHandler(logout));
 router.post(
   "/forgot-password",

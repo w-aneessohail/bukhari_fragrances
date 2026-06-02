@@ -209,3 +209,44 @@ export async function verifyEmail(token: string) {
     data: { isVerified: true }
   });
 }
+
+export async function getCurrentUser(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      avatar: true,
+      phone: true,
+      isVerified: true,
+      loyaltyPoints: true
+    }
+  });
+
+  if (!user) {
+    throw new HttpError("User not found", 404);
+  }
+
+  return user;
+}
+
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!user?.passwordHash) {
+    throw new HttpError("Password change is not available for this account", 400);
+  }
+
+  const matches = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!matches) {
+    throw new HttpError("Current password is incorrect", 400);
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, PASSWORD_SALT_ROUNDS);
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash, refreshToken: null }
+  });
+}

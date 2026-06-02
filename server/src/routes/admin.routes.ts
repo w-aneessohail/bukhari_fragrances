@@ -13,6 +13,8 @@ import {
   listUsersController,
   patchOrderStatus
 } from "../controllers/admin.controller.js";
+import { createBlogPostSchema, blogIdParamsSchema } from "../validators/blog.validator.js";
+import { adminCreate, adminDelete, adminList } from "../controllers/blog.controller.js";
 
 const router = Router();
 
@@ -33,5 +35,9 @@ router.patch(
   asyncHandler(patchOrderStatus)
 );
 router.get("/users", validateQuery(adminListQuerySchema), asyncHandler(listUsersController));
+
+router.get("/blog", asyncHandler(adminList));
+router.post("/blog", validateBody(createBlogPostSchema), asyncHandler(adminCreate));
+router.delete("/blog/:id", validateParams(blogIdParamsSchema), asyncHandler(adminDelete));
 
 export default router;
