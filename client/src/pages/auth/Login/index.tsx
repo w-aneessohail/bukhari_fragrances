@@ -1,5 +1,5 @@
-import PagePlaceholder from "../../../components/common/PagePlaceholder";
+import LoginModal from "../../../components/auth/LoginModal";
 
 export default function LoginPage() {
-  return <PagePlaceholder title="Login" />;
+  return <LoginModal />;
 }

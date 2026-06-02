@@ -8,6 +8,8 @@ export type AccessTokenPayload = {
   email: string;
 };
 
+export type RefreshTokenPayload = AccessTokenPayload;
+
 export function generateAccessToken(payload: AccessTokenPayload) {
   return jwt.sign(payload, env.JWT_SECRET as Secret, {
     expiresIn: env.JWT_EXPIRES_IN
@@ -26,4 +28,8 @@ export function verifyToken<T>(token: string, secret: string): T {
 
 export function verifyAccessToken(token: string) {
   return verifyToken<AccessTokenPayload>(token, env.JWT_SECRET);
+}
+
+export function verifyRefreshToken(token: string) {
+  return verifyToken<RefreshTokenPayload>(token, env.JWT_REFRESH_SECRET);
 }

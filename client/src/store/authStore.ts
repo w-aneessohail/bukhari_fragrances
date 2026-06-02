@@ -10,13 +10,21 @@ type AuthUser = {
 type AuthState = {
   user: AuthUser | null;
   isAuthenticated: boolean;
+  accessToken: string | null;
+  isLoading: boolean;
   setUser: (user: AuthUser | null) => void;
+  setAccessToken: (token: string | null) => void;
+  setLoading: (isLoading: boolean) => void;
   logout: () => void;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
+  accessToken: null,
+  isLoading: false,
   setUser: (user) => set({ user, isAuthenticated: Boolean(user) }),
-  logout: () => set({ user: null, isAuthenticated: false })
+  setAccessToken: (accessToken) => set({ accessToken }),
+  setLoading: (isLoading) => set({ isLoading }),
+  logout: () => set({ user: null, isAuthenticated: false, accessToken: null })
 }));

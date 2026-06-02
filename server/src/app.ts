@@ -3,6 +3,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+import passport from "passport";
+import "./config/passport.js";
 import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { httpLogger } from "./middleware/logger.middleware.js";
@@ -30,6 +32,7 @@ app.use(helmet());
 app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
+app.use(passport.initialize());
 app.use(httpLogger);
 app.use("/api", generalLimiter, routes);
 

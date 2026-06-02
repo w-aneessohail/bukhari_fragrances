@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { ApiResponse } from "../utils/response.utils.js";
+import authRoutes from "./auth.routes.js";
 
 const router = Router();
+
+router.use("/auth", authRoutes);
 
 router.get("/health", (_req, res) => {
   res.json(

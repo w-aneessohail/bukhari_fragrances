@@ -1,5 +1,5 @@
-import PagePlaceholder from "../../../components/common/PagePlaceholder";
+import RegisterForm from "../../../components/auth/RegisterForm";
 
 export default function RegisterPage() {
-  return <PagePlaceholder title="Create Account" />;
+  return <RegisterForm />;
 }
