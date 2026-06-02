@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
+import { useCartStore } from "../../store/cartStore";
 import ProductCard from "../../components/product/ProductCard";
 import ProductGallery from "../../components/product/ProductGallery";
 import ScentNoteWheel from "../../components/product/ScentNoteWheel";
@@ -15,6 +16,10 @@ function formatLabel(value: string) {
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
+  const [addedMessage, setAddedMessage] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const addItem = useCartStore((state) => state.addItem);
+  const cartError = useCartStore((state) => state.error);
 
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ["product", slug],
@@ -75,6 +80,30 @@ export default function ProductDetailPage() {
   const canAddToCart =
     (selectedSize ? selectedSize.stock > 0 : product.stock > 0) && product.isActive;
 
+  const needsSize = product.sizes.length > 0;
+
+  const handleAddToCart = async () => {
+    if (needsSize && !selectedSize) {
+      return;
+    }
+
+    setIsAdding(true);
+    setAddedMessage(false);
+
+    try {
+      await addItem({
+        productId: product.id,
+        sizeId: selectedSize?.id ?? null,
+        quantity: 1
+      });
+      setAddedMessage(true);
+    } catch {
+      // cart store holds error message
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
       <nav className="mb-6 text-sm text-text-secondary">
@@ -129,13 +158,31 @@ export default function ProductDetailPage() {
               onSelect={setSelectedSize}
             />
 
-            <button
-              type="button"
-              disabled={!canAddToCart}
-              className="w-full rounded-lg bg-accent-gold px-6 py-3 font-medium text-bg-primary transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-            >
-              {canAddToCart ? "Add to cart" : "Out of stock"}
-            </button>
+            <div className="space-y-2">
+              <button
+                type="button"
+                disabled={!canAddToCart || isAdding || (needsSize && !selectedSize)}
+                onClick={handleAddToCart}
+                className="w-full rounded-lg bg-accent-gold px-6 py-3 font-medium text-bg-primary transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              >
+                {isAdding ? "Adding…" : canAddToCart ? "Add to cart" : "Out of stock"}
+              </button>
+
+              {needsSize && !selectedSize ? (
+                <p className="text-sm text-text-secondary">Select a size to add this fragrance to your cart.</p>
+              ) : null}
+
+              {cartError ? <p className="text-sm text-red-500">{cartError}</p> : null}
+
+              {addedMessage ? (
+                <p className="text-sm text-accent-gold">
+                  Added to cart.{" "}
+                  <Link to="/cart" className="underline">
+                    View cart
+                  </Link>
+                </p>
+              ) : null}
+            </div>
 
             <p className="text-sm leading-relaxed text-text-secondary">{product.description}</p>
           </div>

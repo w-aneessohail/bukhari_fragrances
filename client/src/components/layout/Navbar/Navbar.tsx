@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ThemeMode } from "../../../enums/ThemeMode";
+import { useCartStore } from "../../../store/cartStore";
 import { useThemeStore } from "../../../store/themeStore";
 
 type NavbarProps = {
@@ -8,6 +9,7 @@ type NavbarProps = {
 
 export default function Navbar({ isScrolled }: NavbarProps) {
   const { theme, setTheme } = useThemeStore();
+  const itemCount = useCartStore((state) => state.cart.itemCount);
 
   return (
     <header
@@ -27,7 +29,16 @@ export default function Navbar({ isScrolled }: NavbarProps) {
           <Link to="/contact">Contact</Link>
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <Link to="/cart" className="relative text-sm text-text-secondary hover:text-accent-gold">
+            Cart
+            {itemCount > 0 ? (
+              <span className="absolute -right-3 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-gold px-1 text-xs font-semibold text-bg-primary">
+                {itemCount > 99 ? "99+" : itemCount}
+              </span>
+            ) : null}
+          </Link>
+
           {Object.values(ThemeMode).map((mode) => (
             <button
               key={mode}
