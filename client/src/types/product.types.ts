@@ -41,6 +41,7 @@ export type Category = {
   slug: string;
   description?: string | null;
   image?: string | null;
+  parentId?: string | null;
   children?: Category[];
 };
 

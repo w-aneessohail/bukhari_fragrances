@@ -1,11 +1,40 @@
+import HeroSection from "../../components/home/HeroSection";
+import CategoryStrip from "../../components/home/CategoryStrip";
+import ProductSection from "../../components/home/ProductSection";
+import BrandStory from "../../components/home/BrandStory";
+import {
+  fetchBestsellerProducts,
+  fetchFeaturedProducts,
+  fetchNewArrivals
+} from "../../services/productService";
+
 export default function HomePage() {
   return (
-    <section className="mx-auto flex min-h-[70vh] max-w-5xl flex-col items-center justify-center px-6 py-20 text-center">
-      <p className="font-body text-sm uppercase tracking-[0.3em] text-text-secondary">Lahore, Pakistan</p>
-      <h1 className="mt-4 font-heading text-6xl text-accent-gold">Bukhari Perfumes</h1>
-      <p className="mt-5 max-w-2xl font-body text-lg text-text-secondary">
-        Discover refined fragrances crafted for modern elegance and timeless presence.
-      </p>
-    </section>
+    <>
+      <HeroSection />
+      <CategoryStrip />
+      <ProductSection
+        title="Featured fragrances"
+        subtitle="Hand-picked selections from our master perfumers"
+        queryKey="featured-products"
+        fetcher={fetchFeaturedProducts}
+        shopLink="/shop?isFeatured=true"
+      />
+      <ProductSection
+        title="Bestsellers"
+        subtitle="Loved by our customers across Pakistan"
+        queryKey="bestseller-products"
+        fetcher={fetchBestsellerProducts}
+        shopLink="/shop?sort=bestseller"
+      />
+      <ProductSection
+        title="New arrivals"
+        subtitle="The latest additions to the Bukhari collection"
+        queryKey="new-arrivals"
+        fetcher={fetchNewArrivals}
+        shopLink="/shop?sort=newest"
+      />
+      <BrandStory />
+    </>
   );
 }

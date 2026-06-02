@@ -46,3 +46,18 @@ export async function fetchProductBySlug(slug: string) {
   const response = await api.get<{ data: ProductDetail }>(`/products/${slug}`);
   return response.data.data;
 }
+
+export async function fetchFeaturedProducts() {
+  const response = await api.get<{ data: ProductSummary[] }>("/products/featured");
+  return response.data.data;
+}
+
+export async function fetchBestsellerProducts() {
+  const response = await api.get<{ data: ProductSummary[] }>("/products/bestsellers");
+  return response.data.data;
+}
+
+export async function fetchNewArrivals() {
+  const response = await api.get<{ data: ProductSummary[] }>("/products/new-arrivals");
+  return response.data.data;
+}

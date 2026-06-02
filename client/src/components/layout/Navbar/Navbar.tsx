@@ -44,6 +44,10 @@ export default function Navbar({ isScrolled }: NavbarProps) {
           </Link>
 
           {isAuthenticated ? (
+            <>
+            <Link to="/profile" className="text-sm text-text-secondary hover:text-accent-gold">
+              Account
+            </Link>
             <Link to="/wishlist" className="relative text-sm text-text-secondary hover:text-accent-gold">
               Wishlist
               {wishlistCount > 0 ? (
@@ -52,7 +56,12 @@ export default function Navbar({ isScrolled }: NavbarProps) {
                 </span>
               ) : null}
             </Link>
-          ) : null}
+            </>
+          ) : (
+            <Link to="/login" className="text-sm text-text-secondary hover:text-accent-gold">
+              Sign in
+            </Link>
+          )}
 
           {Object.values(ThemeMode).map((mode) => (
             <button
