@@ -3,11 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import FilterSidebar from "../../components/shop/FilterSidebar";
 import ProductCard from "../../components/product/ProductCard";
-import { fetchCategories, fetchProducts } from "../../services/productService";
+import { fetchCategories, fetchProducts, searchProducts } from "../../services/productService";
 
 export default function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  const searchQuery = searchParams.get("q")?.trim() || undefined;
 
   const filters = useMemo(
     () => ({
@@ -42,21 +44,23 @@ export default function ShopPage() {
   });
 
   const { data: productsResponse, isLoading } = useQuery({
-    queryKey: ["products", filters],
+    queryKey: ["products", filters, searchQuery],
     queryFn: () =>
-      fetchProducts({
-        page: filters.page,
-        limit: 12,
-        category: filters.category,
-        gender: filters.gender,
-        scentFamily: filters.scentFamily,
-        concentration: filters.concentration,
-        minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
-        maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
-        inStock: filters.inStock || undefined,
-        onSale: filters.onSale || undefined,
-        sort: filters.sort
-      })
+      searchQuery
+        ? searchProducts(searchQuery, filters.page, 12)
+        : fetchProducts({
+            page: filters.page,
+            limit: 12,
+            category: filters.category,
+            gender: filters.gender,
+            scentFamily: filters.scentFamily,
+            concentration: filters.concentration,
+            minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
+            maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+            inStock: filters.inStock || undefined,
+            onSale: filters.onSale || undefined,
+            sort: filters.sort
+          })
   });
 
   const products = productsResponse?.data ?? [];
@@ -75,6 +79,7 @@ export default function ShopPage() {
 
   const clearFilters = () => {
     const next = new URLSearchParams();
+    if (searchQuery) next.set("q", searchQuery);
     if (filters.sort) next.set("sort", filters.sort);
     setSearchParams(next);
   };
@@ -82,8 +87,12 @@ export default function ShopPage() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
       <div className="mb-8">
-        <h1 className="font-heading text-4xl text-accent-gold">Shop Bukhari Perfumes</h1>
-        <p className="mt-2 text-text-secondary">Explore our curated fragrance collection.</p>
+        <h1 className="font-heading text-4xl text-accent-gold">
+          {searchQuery ? `Search: “${searchQuery}”` : "Shop Bukhari Perfumes"}
+        </h1>
+        <p className="mt-2 text-text-secondary">
+          {searchQuery ? "Results from our fragrance catalog." : "Explore our curated fragrance collection."}
+        </p>
       </div>
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -144,7 +153,9 @@ export default function ShopPage() {
           )}
 
           {!isLoading && products.length === 0 ? (
-            <p className="mt-8 text-center text-text-secondary">No products match your filters.</p>
+            <p className="mt-8 text-center text-text-secondary">
+              {searchQuery ? "No fragrances matched your search." : "No products match your filters."}
+            </p>
           ) : null}
         </div>
       </div>

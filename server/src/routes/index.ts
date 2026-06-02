@@ -7,6 +7,8 @@ import searchRoutes from "./search.routes.js";
 import cartRoutes from "./cart.routes.js";
 import wishlistRoutes from "./wishlist.routes.js";
 import orderRoutes from "./order.routes.js";
+import contactRoutes from "./contact.routes.js";
+import adminRoutes from "./admin.routes.js";
 
 const router = Router();
 
@@ -17,6 +19,8 @@ router.use("/search", searchRoutes);
 router.use("/cart", cartRoutes);
 router.use("/wishlist", wishlistRoutes);
 router.use("/orders", orderRoutes);
+router.use("/contact", contactRoutes);
+router.use("/admin", adminRoutes);
 
 router.get("/health", (_req, res) => {
   res.json(

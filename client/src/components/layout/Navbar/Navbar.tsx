@@ -4,6 +4,7 @@ import { useAuthStore } from "../../../store/authStore";
 import { useCartStore } from "../../../store/cartStore";
 import { useWishlistStore } from "../../../store/wishlistStore";
 import { useThemeStore } from "../../../store/themeStore";
+import SearchBar from "./SearchBar";
 
 type NavbarProps = {
   isScrolled: boolean;
@@ -14,6 +15,8 @@ export default function Navbar({ isScrolled }: NavbarProps) {
   const itemCount = useCartStore((state) => state.cart.itemCount);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const wishlistCount = useWishlistStore((state) => state.items.length);
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
 
   return (
     <header
@@ -34,6 +37,8 @@ export default function Navbar({ isScrolled }: NavbarProps) {
         </nav>
 
         <div className="flex items-center gap-3">
+          <SearchBar />
+
           <Link to="/cart" className="relative text-sm text-text-secondary hover:text-accent-gold">
             Cart
             {itemCount > 0 ? (
@@ -42,6 +47,12 @@ export default function Navbar({ isScrolled }: NavbarProps) {
               </span>
             ) : null}
           </Link>
+
+          {isAdmin ? (
+            <Link to="/admin" className="text-sm text-text-secondary hover:text-accent-gold">
+              Admin
+            </Link>
+          ) : null}
 
           {isAuthenticated ? (
             <>

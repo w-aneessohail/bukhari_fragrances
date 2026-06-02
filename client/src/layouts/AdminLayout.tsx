@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 const adminLinks = [
   { to: "/admin", label: "Dashboard" },
@@ -11,6 +11,7 @@ const adminLinks = [
 
 export default function AdminLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const location = useLocation();
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary md:flex">
@@ -31,11 +32,19 @@ export default function AdminLayout() {
         </div>
 
         <nav className="space-y-2">
+          <Link to="/" className="mb-4 block rounded px-3 py-2 text-sm text-text-secondary hover:text-accent-gold">
+            {isCollapsed ? "←" : "← Back to store"}
+          </Link>
+
           {adminLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className="block rounded px-3 py-2 text-sm text-text-secondary hover:bg-card hover:text-text-primary"
+              className={`block rounded px-3 py-2 text-sm hover:bg-card ${
+                location.pathname === link.to
+                  ? "bg-card text-accent-gold"
+                  : "text-text-secondary hover:text-text-primary"
+              }`}
             >
               {isCollapsed ? link.label[0] : link.label}
             </Link>

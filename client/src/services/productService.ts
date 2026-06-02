@@ -61,3 +61,10 @@ export async function fetchNewArrivals() {
   const response = await api.get<{ data: ProductSummary[] }>("/products/new-arrivals");
   return response.data.data;
 }
+
+export async function searchProducts(query: string, page = 1, limit = 12) {
+  const response = await api.get<ProductListResponse>("/search", {
+    params: { q: query, page, limit }
+  });
+  return response.data;
+}
