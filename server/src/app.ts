@@ -1,10 +1,12 @@
 import compression from "compression";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import morgan from "morgan";
 import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { httpLogger } from "./middleware/logger.middleware.js";
+import { generalLimiter } from "./middleware/rateLimiter.js";
 import routes from "./routes/index.js";
 
 const app = express();
@@ -26,10 +28,10 @@ app.use(
 
 app.use(helmet());
 app.use(compression());
+app.use(cookieParser());
 app.use(express.json());
-app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
-
-app.use("/api", routes);
+app.use(httpLogger);
+app.use("/api", generalLimiter, routes);
 
 app.use(errorHandler);
 
