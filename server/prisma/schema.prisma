@@ -1,0 +1,410 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentGateway {
+  STRIPE
+  JAZZCASH
+  EASYPAISA
+  COD
+}
+
+enum ScentFamily {
+  FLORAL
+  ORIENTAL
+  WOODY
+  FRESH
+  CITRUS
+  GOURMAND
+  CHYPRE
+  FOUGERE
+  AQUATIC
+}
+
+enum Concentration {
+  EAU_DE_COLOGNE
+  EAU_DE_TOILETTE
+  EAU_DE_PARFUM
+  PARFUM
+  ATTAR
+}
+
+enum Gender {
+  MEN
+  WOMEN
+  UNISEX
+}
+
+enum NoteType {
+  TOP
+  HEART
+  BASE
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_SHIPPING
+}
+
+enum LoyaltyTransactionType {
+  EARNED
+  REDEEMED
+  ADJUSTED
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  name                String
+  passwordHash        String?
+  googleId            String?              @unique
+  role                UserRole             @default(CUSTOMER)
+  avatar              String?
+  phone               String?
+  isVerified          Boolean              @default(false)
+  loyaltyPoints       Int                  @default(0)
+  refreshToken        String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  addresses           Address[]
+  reviews             Review[]
+  carts               Cart[]
+  orders              Order[]
+  wishlistItems       Wishlist[]
+  diaryEntries        ScentDiary[]
+  loyaltyTransactions LoyaltyTransaction[]
+  blogPosts           BlogPost[]           @relation("BlogAuthor")
+  notifications       Notification[]
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  label      String
+  street     String
+  area       String
+  city       String
+  province   String
+  postalCode String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Category {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String?
+  image       String?
+  parentId    String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  parent      Category?   @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[]  @relation("CategoryTree")
+  products    Product[]
+
+  @@index([parentId])
+}
+
+model Product {
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  description   String
+  price         Decimal       @db.Decimal(10, 2)
+  salePrice     Decimal?      @db.Decimal(10, 2)
+  stock         Int
+  sku           String        @unique
+  categoryId    String
+  gender        Gender
+  concentration Concentration
+  scentFamily   ScentFamily
+  isActive      Boolean       @default(true)
+  isFeatured    Boolean       @default(false)
+  tags          String[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  category      Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images        ProductImage[]
+  scentNotes    ScentNote[]
+  sizes         ProductSize[]
+  reviews       Review[]
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  wishlistItems Wishlist[]
+  diaryEntries  ScentDiary[]
+
+  @@index([categoryId])
+  @@index([isActive, isFeatured])
+  @@index([createdAt])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  publicId  String?
+  altText   String?
+  isMain    Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+model ScentNote {
+  id             String   @id @default(cuid())
+  productId      String
+  noteType       NoteType
+  ingredientName String
+  intensity      Int
+  createdAt      DateTime @default(now())
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, noteType])
+}
+
+model ProductSize {
+  id        String   @id @default(cuid())
+  productId String
+  sizeMl    Int
+  price     Decimal  @db.Decimal(10, 2)
+  stock     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems CartItem[]
+
+  @@unique([productId, sizeMl])
+  @@index([productId])
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  userId      String
+  productId   String
+  rating      Int
+  comment     String?
+  isVerified  Boolean  @default(false)
+  helpfulCount Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([productId, createdAt])
+}
+
+model Cart {
+  id          String     @id @default(cuid())
+  userId      String?
+  sessionId   String?
+  discountId  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  user        User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discount    Discount?  @relation(fields: [discountId], references: [id], onDelete: SetNull)
+  items       CartItem[]
+
+  @@unique([userId])
+  @@unique([sessionId])
+  @@index([updatedAt])
+}
+
+model CartItem {
+  id         String      @id @default(cuid())
+  cartId     String
+  productId  String
+  sizeId     String?
+  quantity   Int
+  price      Decimal     @db.Decimal(10, 2)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  cart       Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  size       ProductSize? @relation(fields: [sizeId], references: [id], onDelete: SetNull)
+
+  @@unique([cartId, productId, sizeId])
+  @@index([cartId])
+}
+
+model Order {
+  id            String         @id @default(cuid())
+  userId        String
+  orderNumber   String         @unique
+  status        OrderStatus    @default(PENDING)
+  subtotal      Decimal        @db.Decimal(10, 2)
+  discount      Decimal        @default(0) @db.Decimal(10, 2)
+  shipping      Decimal        @default(0) @db.Decimal(10, 2)
+  total         Decimal        @db.Decimal(10, 2)
+  paymentMethod PaymentGateway
+  paymentStatus PaymentStatus  @default(PENDING)
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User           @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items         OrderItem[]
+  payments      Payment[]
+  loyaltyTransactions LoyaltyTransaction[]
+
+  @@index([userId, createdAt])
+  @@index([status, paymentStatus])
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  productId  String
+  name       String
+  price      Decimal  @db.Decimal(10, 2)
+  quantity   Int
+  sizeLabel  String?
+  image      String?
+  createdAt  DateTime @default(now())
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+}
+
+model Payment {
+  id               String         @id @default(cuid())
+  orderId          String
+  gateway          PaymentGateway
+  gatewayPaymentId String?
+  amount           Decimal        @db.Decimal(10, 2)
+  currency         String         @default("PKR")
+  status           PaymentStatus  @default(PENDING)
+  metadata         Json?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, status])
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  addedAt   DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId, addedAt])
+}
+
+model ScentDiary {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  rating    Int?
+  mood      String?
+  occasion  String?
+  notes     String?
+  dateWorn  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([userId, dateWorn])
+}
+
+model Discount {
+  id         String       @id @default(cuid())
+  code       String       @unique
+  type       DiscountType
+  value      Decimal      @db.Decimal(10, 2)
+  minOrder   Decimal?     @db.Decimal(10, 2)
+  maxUses    Int?
+  usedCount  Int          @default(0)
+  expiresAt  DateTime?
+  isActive   Boolean      @default(true)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  carts      Cart[]
+
+  @@index([isActive, expiresAt])
+}
+
+model LoyaltyTransaction {
+  id          String                  @id @default(cuid())
+  userId      String
+  orderId     String?
+  type        LoyaltyTransactionType
+  points      Int
+  description String?
+  createdAt   DateTime                @default(now())
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order       Order?                  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  excerpt     String?
+  image       String?
+  authorId    String
+  publishedAt DateTime?
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  author      User     @relation("BlogAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([publishedAt])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+}
