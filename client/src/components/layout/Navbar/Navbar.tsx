@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { ThemeMode } from "../../../enums/ThemeMode";
+import { useAuthStore } from "../../../store/authStore";
 import { useCartStore } from "../../../store/cartStore";
+import { useWishlistStore } from "../../../store/wishlistStore";
 import { useThemeStore } from "../../../store/themeStore";
 
 type NavbarProps = {
@@ -10,6 +12,8 @@ type NavbarProps = {
 export default function Navbar({ isScrolled }: NavbarProps) {
   const { theme, setTheme } = useThemeStore();
   const itemCount = useCartStore((state) => state.cart.itemCount);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const wishlistCount = useWishlistStore((state) => state.items.length);
 
   return (
     <header
@@ -38,6 +42,17 @@ export default function Navbar({ isScrolled }: NavbarProps) {
               </span>
             ) : null}
           </Link>
+
+          {isAuthenticated ? (
+            <Link to="/wishlist" className="relative text-sm text-text-secondary hover:text-accent-gold">
+              Wishlist
+              {wishlistCount > 0 ? (
+                <span className="absolute -right-3 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-gold px-1 text-xs font-semibold text-bg-primary">
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
 
           {Object.values(ThemeMode).map((mode) => (
             <button

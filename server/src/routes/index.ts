@@ -5,6 +5,8 @@ import productRoutes from "./product.routes.js";
 import categoryRoutes from "./category.routes.js";
 import searchRoutes from "./search.routes.js";
 import cartRoutes from "./cart.routes.js";
+import wishlistRoutes from "./wishlist.routes.js";
+import orderRoutes from "./order.routes.js";
 
 const router = Router();
 
@@ -13,6 +15,8 @@ router.use("/products", productRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/search", searchRoutes);
 router.use("/cart", cartRoutes);
+router.use("/wishlist", wishlistRoutes);
+router.use("/orders", orderRoutes);
 
 router.get("/health", (_req, res) => {
   res.json(

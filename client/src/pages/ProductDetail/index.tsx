@@ -6,6 +6,7 @@ import ProductCard from "../../components/product/ProductCard";
 import ProductGallery from "../../components/product/ProductGallery";
 import ScentNoteWheel from "../../components/product/ScentNoteWheel";
 import SizeSelector from "../../components/product/SizeSelector";
+import WishlistButton from "../../components/product/WishlistButton";
 import { fetchProductBySlug } from "../../services/productService";
 import type { ProductSize } from "../../types/product.types";
 
@@ -158,15 +159,19 @@ export default function ProductDetailPage() {
               onSelect={setSelectedSize}
             />
 
-            <div className="space-y-2">
+            <div className="flex flex-wrap gap-3">
               <button
                 type="button"
                 disabled={!canAddToCart || isAdding || (needsSize && !selectedSize)}
                 onClick={handleAddToCart}
-                className="w-full rounded-lg bg-accent-gold px-6 py-3 font-medium text-bg-primary transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                className="rounded-lg bg-accent-gold px-6 py-3 font-medium text-bg-primary transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isAdding ? "Adding…" : canAddToCart ? "Add to cart" : "Out of stock"}
               </button>
+              <WishlistButton productId={product.id} />
+            </div>
+
+            <div className="space-y-2">
 
               {needsSize && !selectedSize ? (
                 <p className="text-sm text-text-secondary">Select a size to add this fragrance to your cart.</p>

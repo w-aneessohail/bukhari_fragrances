@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import CartLineItem from "../../components/cart/CartLineItem";
+import { useAuthStore } from "../../store/authStore";
 import { useCartStore } from "../../store/cartStore";
 
 export default function CartPage() {
   const { cart, isLoading, error, updateItem, removeItem, clear } = useCartStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const handleUpdateQuantity = async (itemId: string, quantity: number) => {
@@ -91,10 +93,10 @@ export default function CartPage() {
             </dl>
             <p className="mt-6 text-2xl font-semibold text-accent-gold">Rs. {cart.subtotal.toLocaleString()}</p>
             <Link
-              to="/checkout"
+              to={isAuthenticated ? "/checkout" : "/login"}
               className="mt-6 block w-full rounded-lg bg-accent-gold px-6 py-3 text-center font-medium text-bg-primary"
             >
-              Proceed to checkout
+              {isAuthenticated ? "Proceed to checkout" : "Sign in to checkout"}
             </Link>
             <Link to="/shop" className="mt-3 block text-center text-sm text-text-secondary underline">
               Continue shopping

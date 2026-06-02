@@ -53,6 +53,16 @@ export default function AppRouter() {
             <Route path="contact" element={<ContactPage />} />
             <Route path="blog" element={<BlogPage />} />
             <Route path="blog/:slug" element={<BlogPostPage />} />
+            <Route path="cart" element={<CartPage />} />
+
+            <Route element={<PrivateRoute />}>
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="orders/:id" element={<OrderTrackingPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="wishlist" element={<WishlistPage />} />
+              <Route path="scent-diary" element={<ScentDiaryPage />} />
+              <Route path="gift-builder" element={<GiftBuilderPage />} />
+            </Route>
           </Route>
 
           <Route element={<AuthLayout />}>
@@ -60,16 +70,6 @@ export default function AppRouter() {
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="reset-password/:token" element={<ResetPasswordPage />} />
-          </Route>
-
-          <Route element={<PrivateRoute />}>
-            <Route path="cart" element={<CartPage />} />
-            <Route path="orders" element={<OrdersPage />} />
-            <Route path="orders/:id" element={<OrderTrackingPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="wishlist" element={<WishlistPage />} />
-            <Route path="scent-diary" element={<ScentDiaryPage />} />
-            <Route path="gift-builder" element={<GiftBuilderPage />} />
           </Route>
 
           <Route element={<PrivateRoute />}>
