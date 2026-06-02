@@ -8,6 +8,8 @@
   --border-color: #e5ddd5;
   --card-bg: #ffffff;
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --navbar-bg: rgba(250, 250, 247, 0.9);
+  --input-bg: #ffffff;
 }
 
 :root[data-theme="dark"] {
@@ -20,6 +22,8 @@
   --border-color: #2c2c3e;
   --card-bg: #1e1e30;
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --navbar-bg: rgba(13, 13, 13, 0.88);
+  --input-bg: #1e1e30;
 }
 
 :root[data-theme="amber"] {
@@ -32,4 +36,6 @@
   --border-color: #3d2b12;
   --card-bg: #231608;
   --shadow: 0 4px 32px rgba(212, 175, 55, 0.12);
+  --navbar-bg: rgba(28, 18, 8, 0.9);
+  --input-bg: #231608;
 }

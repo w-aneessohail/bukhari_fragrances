@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
+import { QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
+import { queryClient } from "./config/queryClient";
+import { useThemeStore } from "./store/themeStore";
 import "./index.css";
+
+function Root() {
+  const initializeTheme = useThemeStore((state) => state.initializeTheme);
+
+  useEffect(() => {
+    initializeTheme();
+  }, [initializeTheme]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  );
+}
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <Root />
   </React.StrictMode>
 );

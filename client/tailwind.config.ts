@@ -22,7 +22,9 @@ const config: Config = {
           warm: "var(--accent-warm)"
         },
         border: "var(--border-color)",
-        card: "var(--card-bg)"
+        card: "var(--card-bg)",
+        navbar: "var(--navbar-bg)",
+        input: "var(--input-bg)"
       },
       boxShadow: {
         luxury: "var(--shadow)"
