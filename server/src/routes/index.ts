@@ -1,10 +1,16 @@
 import { Router } from "express";
 import { ApiResponse } from "../utils/response.utils.js";
 import authRoutes from "./auth.routes.js";
+import productRoutes from "./product.routes.js";
+import categoryRoutes from "./category.routes.js";
+import searchRoutes from "./search.routes.js";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
+router.use("/products", productRoutes);
+router.use("/categories", categoryRoutes);
+router.use("/search", searchRoutes);
 
 router.get("/health", (_req, res) => {
   res.json(

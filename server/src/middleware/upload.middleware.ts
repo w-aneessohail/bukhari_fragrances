@@ -94,3 +94,17 @@ export function uploadMultiple(folder: string, max = 10) {
     }
   ];
 }
+
+export function uploadMultipleDynamic(resolveFolder: (req: Request) => string, max = 10) {
+  return [
+    upload.array("images", max),
+    async (req: Request, _res: Response, next: NextFunction) => {
+      try {
+        await handleUploadedFiles(req, resolveFolder(req));
+        next();
+      } catch (error) {
+        next(error);
+      }
+    }
+  ];
+}
