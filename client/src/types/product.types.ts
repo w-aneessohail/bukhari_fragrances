@@ -43,3 +43,43 @@ export type Category = {
   image?: string | null;
   children?: Category[];
 };
+
+export type ProductImage = {
+  id: string;
+  url: string;
+  altText: string | null;
+  isMain: boolean;
+  sortOrder: number;
+};
+
+export type ScentNote = {
+  id: string;
+  noteType: "TOP" | "HEART" | "BASE";
+  ingredientName: string;
+  intensity: number;
+};
+
+export type ProductSize = {
+  id: string;
+  sizeMl: number;
+  price: number;
+  stock: number;
+};
+
+export type ProductReview = {
+  id: string;
+  rating: number;
+  comment: string | null;
+  isVerified: boolean;
+  helpfulCount: number;
+  createdAt: string;
+  user: { id: string; name: string };
+};
+
+export type ProductDetail = ProductSummary & {
+  images: ProductImage[];
+  scentNotes: ScentNote[];
+  sizes: ProductSize[];
+  reviews: ProductReview[];
+  relatedProducts: ProductSummary[];
+};

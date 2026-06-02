@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { Category, ProductListResponse, ProductSummary } from "../types/product.types";
+import type { Category, ProductDetail, ProductListResponse, ProductSummary } from "../types/product.types";
 
 export type ProductFilters = {
   page?: number;
@@ -43,6 +43,6 @@ export async function fetchCategories() {
 }
 
 export async function fetchProductBySlug(slug: string) {
-  const response = await api.get<{ data: ProductSummary }>(`/products/${slug}`);
+  const response = await api.get<{ data: ProductDetail }>(`/products/${slug}`);
   return response.data.data;
 }
