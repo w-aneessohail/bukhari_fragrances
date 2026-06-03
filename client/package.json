@@ -17,11 +17,12 @@
     "framer-motion": "^11.2.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.53.0",
     "react-router-dom": "^6.30.1",
-    "zxcvbn": "^4.4.2",
     "zod": "^3.25.67",
-    "zustand": "^4.5.2"
+    "zustand": "^4.5.2",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

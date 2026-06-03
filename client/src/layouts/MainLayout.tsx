@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Footer from "../components/layout/Footer/Footer";
 import Navbar from "../components/layout/Navbar/Navbar";
+import ScrollProgress from "../components/layout/ScrollProgress";
 import CartDrawer from "../components/cart/CartDrawer";
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
@@ -32,6 +33,7 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary">
+      <ScrollProgress />
       <Navbar isScrolled={isScrolled} />
       <Outlet />
       <Footer />

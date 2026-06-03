@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { HelmetProvider } from "react-helmet-async";
 import App from "./App";
 import { queryClient } from "./config/queryClient";
 import { useThemeStore } from "./store/themeStore";
@@ -14,9 +15,11 @@ function Root() {
   }, [initializeTheme]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 

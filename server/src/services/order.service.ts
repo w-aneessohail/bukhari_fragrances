@@ -1,9 +1,12 @@
-import { PaymentGateway, PaymentStatus, Prisma } from "@prisma/client";
+import { PaymentGateway, Prisma } from "@prisma/client";
 import { prisma } from "../config/database.js";
-import { stripe } from "../config/stripe.js";
 import { calculateCartTotals, validateDiscountForCart } from "../utils/cartTotals.utils.js";
+import { COD_FEE } from "../utils/loyalty.utils.js";
 import { HttpError } from "../utils/httpError.js";
 import { decimalToNumber } from "../utils/product.utils.js";
+import { sendOrderConfirmation } from "./email.service.js";
+import { previewLoyaltyRedemption, redeemLoyaltyPoints, restoreLoyaltyOnCancel } from "./loyalty.service.js";
+import { createStripePaymentIntent, initiateJazzCashPayment } from "./payment.service.js";
 
 const cartInclude = {
   discount: true,
@@ -21,7 +24,7 @@ const cartInclude = {
 };
 
 type CreateOrderInput = {
-  paymentMethod: "COD" | "STRIPE";
+  paymentMethod: "COD" | "STRIPE" | "JAZZCASH";
   address: {
     label: string;
     street: string;
@@ -29,9 +32,12 @@ type CreateOrderInput = {
     city: string;
     province: string;
     postalCode: string;
+    phone?: string;
   };
   saveAddress?: boolean;
   notes?: string;
+  redeemLoyaltyPoints?: boolean;
+  jazzCashMobile?: string;
 };
 
 function generateOrderNumber() {
@@ -131,13 +137,18 @@ export async function getCheckoutSummary(userId: string) {
   }
 
   const { discountAmount, shipping, total } = calculateCartTotals(subtotal, activeDiscount);
+  const loyaltyPreview = await previewLoyaltyRedemption(userId, Math.max(0, subtotal - discountAmount + shipping));
 
   return {
     subtotal: Number(subtotal.toFixed(2)),
     shipping,
     discount: discountAmount,
-    total,
     discountCode: activeDiscount?.code ?? null,
+    codFee: COD_FEE,
+    loyaltyBalance: loyaltyPreview.balance,
+    loyaltyDiscount: loyaltyPreview.discount,
+    loyaltyPointsUsed: loyaltyPreview.pointsUsed,
+    total,
     itemCount: cart.items.reduce((sum, item) => sum + item.quantity, 0)
   };
 }
@@ -184,7 +195,19 @@ export async function createOrderFromCart(userId: string, input: CreateOrderInpu
     }
   }
 
-  const { discountAmount, shipping, total } = calculateCartTotals(subtotal, activeDiscount);
+  const { discountAmount, shipping, total: cartTotal } = calculateCartTotals(subtotal, activeDiscount);
+  const preLoyaltyTotal = Math.max(0, cartTotal);
+  let loyaltyDiscount = 0;
+  let loyaltyPointsUsed = 0;
+
+  if (input.redeemLoyaltyPoints) {
+    const redemption = await previewLoyaltyRedemption(userId, preLoyaltyTotal);
+    loyaltyDiscount = redemption.discount;
+    loyaltyPointsUsed = redemption.pointsUsed;
+  }
+
+  const codFee = input.paymentMethod === "COD" ? COD_FEE : 0;
+  const total = Number(Math.max(0, preLoyaltyTotal - loyaltyDiscount + codFee).toFixed(2));
   const orderNumber = generateOrderNumber();
   const paymentGateway: PaymentGateway = input.paymentMethod;
   const shippingNotes = formatShippingNotes(input);
@@ -215,8 +238,8 @@ export async function createOrderFromCart(userId: string, input: CreateOrderInpu
         orderNumber,
         status: input.paymentMethod === "COD" ? "CONFIRMED" : "PENDING",
         subtotal: new Prisma.Decimal(subtotal),
-        discount: new Prisma.Decimal(discountAmount),
-        shipping: new Prisma.Decimal(shipping),
+        discount: new Prisma.Decimal(discountAmount + loyaltyDiscount),
+        shipping: new Prisma.Decimal(shipping + codFee),
         total: new Prisma.Decimal(total),
         paymentMethod: paymentGateway,
         paymentStatus: input.paymentMethod === "COD" ? "PENDING" : "PENDING",
@@ -281,36 +304,38 @@ export async function createOrderFromCart(userId: string, input: CreateOrderInpu
     return createdOrder;
   });
 
+  if (loyaltyPointsUsed > 0) {
+    await redeemLoyaltyPoints(userId, preLoyaltyTotal, order.id);
+  }
+
   let clientSecret: string | null = null;
+  let jazzCashRedirect: { redirectUrl: string; formFields: Record<string, string> } | null = null;
 
   if (input.paymentMethod === "STRIPE") {
     try {
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(total * 100),
-        currency: "pkr",
-        metadata: {
-          orderId: order.id,
-          orderNumber: order.orderNumber
-        }
-      });
-
-      clientSecret = paymentIntent.client_secret;
-
-      await prisma.payment.updateMany({
-        where: { orderId: order.id },
-        data: {
-          gatewayPaymentId: paymentIntent.id,
-          metadata: { paymentIntentId: paymentIntent.id }
-        }
-      });
+      const payment = await createStripePaymentIntent(order.id);
+      clientSecret = payment.clientSecret;
     } catch {
       throw new HttpError("Card payment is unavailable. Please choose cash on delivery.", 503);
     }
   }
 
+  if (input.paymentMethod === "COD") {
+    await sendOrderConfirmation(order.id);
+  }
+
+  if (input.paymentMethod === "JAZZCASH" && input.jazzCashMobile) {
+    try {
+      jazzCashRedirect = await initiateJazzCashPayment(order.id, input.jazzCashMobile);
+    } catch {
+      throw new HttpError("JazzCash payment is unavailable. Please choose cash on delivery.", 503);
+    }
+  }
+
   return {
     order: mapOrder(order),
-    clientSecret
+    clientSecret,
+    jazzCashRedirect
   };
 }
 
@@ -445,6 +470,8 @@ export async function cancelUserOrder(userId: string, orderId: string) {
       data: { status: "CANCELLED" }
     });
   });
+
+  await restoreLoyaltyOnCancel(orderId);
 
   return getOrderTracking(userId, orderId);
 }

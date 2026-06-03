@@ -102,3 +102,20 @@ export async function deleteAddressController(req: Request, res: Response) {
     })
   );
 }
+
+export async function loyaltySummaryController(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new HttpError("Authentication required", 401);
+  }
+
+  const { getUserLoyaltySummary } = await import("../services/loyalty.service.js");
+  const summary = await getUserLoyaltySummary(userId);
+  res.json(
+    new ApiResponse({
+      success: true,
+      message: "Loyalty summary retrieved",
+      data: summary
+    })
+  );
+}

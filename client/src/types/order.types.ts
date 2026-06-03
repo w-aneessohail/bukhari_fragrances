@@ -4,6 +4,11 @@ export type CheckoutSummary = {
   discount: number;
   total: number;
   itemCount: number;
+  discountCode?: string | null;
+  codFee?: number;
+  loyaltyBalance?: number;
+  loyaltyDiscount?: number;
+  loyaltyPointsUsed?: number;
 };
 
 export type OrderItem = {
@@ -33,7 +38,7 @@ export type Order = {
 };
 
 export type CreateOrderInput = {
-  paymentMethod: "COD" | "STRIPE";
+  paymentMethod: "COD" | "STRIPE" | "JAZZCASH";
   address: {
     label: string;
     street: string;
@@ -41,7 +46,10 @@ export type CreateOrderInput = {
     city: string;
     province: string;
     postalCode: string;
+    phone?: string;
   };
   saveAddress?: boolean;
   notes?: string;
+  redeemLoyaltyPoints?: boolean;
+  jazzCashMobile?: string;
 };

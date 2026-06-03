@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReviewForm, { ReviewList } from "../../components/product/ReviewForm";
+import PageMeta from "../../components/seo/PageMeta";
 import { useCartStore } from "../../store/cartStore";
 import { fetchMyProductReview } from "../../services/reviewService";
 import ProductCard from "../../components/product/ProductCard";
@@ -115,6 +116,12 @@ export default function ProductDetailPage() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
+      <PageMeta
+        title={product.name}
+        description={product.description.slice(0, 160)}
+        image={product.mainImage ?? undefined}
+        path={`/product/${product.slug}`}
+      />
       <nav className="mb-6 text-sm text-text-secondary">
         <Link to="/shop" className="hover:text-accent-gold">
           Shop

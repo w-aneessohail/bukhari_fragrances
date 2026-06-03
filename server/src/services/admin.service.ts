@@ -3,6 +3,9 @@ import { prisma } from "../config/database.js";
 import { HttpError } from "../utils/httpError.js";
 import { decimalToNumber } from "../utils/product.utils.js";
 import { parsePaginationParams, buildPaginationMeta } from "../utils/pagination.utils.js";
+import { sendShippingUpdate } from "./email.service.js";
+import { awardLoyaltyForDeliveredOrder } from "./loyalty.service.js";
+import { ORDER_STATUS_LABELS } from "./payment.service.js";
 
 export async function getDashboardStats() {
   const [activeProducts, totalOrders, totalCustomers, revenueAggregate, pendingOrders] = await Promise.all([
@@ -68,6 +71,14 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
       items: true
     }
   });
+
+  if (status !== order.status) {
+    await sendShippingUpdate(orderId, ORDER_STATUS_LABELS[status]);
+  }
+
+  if (status === "DELIVERED") {
+    await awardLoyaltyForDeliveredOrder(orderId);
+  }
 
   return {
     id: updated.id,

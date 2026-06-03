@@ -4,6 +4,8 @@ import ProductSection from "../../components/home/ProductSection";
 import BrandStory from "../../components/home/BrandStory";
 import ScentFinderSection from "../../components/home/ScentFinderSection";
 import TestimonialsSection from "../../components/home/TestimonialsSection";
+import NewsletterSection from "../../components/home/NewsletterSection";
+import PageMeta from "../../components/seo/PageMeta";
 import {
   fetchBestsellerProducts,
   fetchFeaturedProducts,
@@ -13,6 +15,11 @@ import {
 export default function HomePage() {
   return (
     <>
+      <PageMeta
+        title="Bukhari Perfumes — Luxury Fragrances from Lahore"
+        description="Discover oud, attar, and signature eau de parfum collections handcrafted by Bukhari Perfumes in Lahore."
+        path="/"
+      />
       <HeroSection />
       <CategoryStrip />
       <ProductSection
@@ -38,6 +45,7 @@ export default function HomePage() {
       />
       <ScentFinderSection />
       <TestimonialsSection />
+      <NewsletterSection />
       <BrandStory />
     </>
   );

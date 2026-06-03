@@ -12,6 +12,7 @@ import {
   deleteAddressController,
   getMe,
   listAddressesController,
+  loyaltySummaryController,
   updateAddressController
 } from "../controllers/user.controller.js";
 
@@ -26,6 +27,7 @@ const asyncHandler = (handler: RequestHandler): RequestHandler => {
 router.use(verifyAccessToken);
 
 router.get("/me", asyncHandler(getMe));
+router.get("/loyalty", asyncHandler(loyaltySummaryController));
 router.post("/change-password", validateBody(changePasswordSchema), asyncHandler(changePasswordController));
 router.get("/addresses", asyncHandler(listAddressesController));
 router.post("/addresses", validateBody(addressSchema), asyncHandler(createAddressController));

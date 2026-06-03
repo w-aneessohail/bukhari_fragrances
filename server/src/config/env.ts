@@ -15,9 +15,14 @@ const envSchema = z.object({
   GOOGLE_CALLBACK_URL: z.string().url(),
   CLOUDINARY_URL: z.string().min(1),
   STRIPE_SECRET_KEY: z.string().min(1),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
   SENDGRID_API_KEY: z.string().min(1),
   SENDGRID_FROM_EMAIL: z.string().email(),
-  TWILIO_ACCOUNT_SID: z.string().min(1)
+  TWILIO_ACCOUNT_SID: z.string().min(1),
+  JAZZCASH_MERCHANT_ID: z.string().optional(),
+  JAZZCASH_PASSWORD: z.string().optional(),
+  JAZZCASH_INTEGRITY_SALT: z.string().optional(),
+  JAZZCASH_POST_URL: z.string().url().optional()
 });
 
 const parsed = envSchema.safeParse(process.env);

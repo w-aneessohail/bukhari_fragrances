@@ -7,7 +7,13 @@ export async function fetchCheckoutSummary() {
 }
 
 export async function placeOrder(input: CreateOrderInput) {
-  const response = await api.post<{ data: { order: Order; clientSecret: string | null } }>("/orders", input);
+  const response = await api.post<{
+    data: {
+      order: Order;
+      clientSecret: string | null;
+      jazzCashRedirect?: { redirectUrl: string; formFields: Record<string, string> } | null;
+    };
+  }>("/orders", input);
   return response.data.data;
 }
 

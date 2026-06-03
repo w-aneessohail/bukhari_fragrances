@@ -6,14 +6,17 @@ const addressSchema = z.object({
   area: z.string().min(1).max(120),
   city: z.string().min(1).max(80),
   province: z.string().min(1).max(80),
-  postalCode: z.string().min(1).max(20)
+  postalCode: z.string().min(1).max(20),
+  phone: z.string().max(20).optional()
 });
 
 export const createOrderSchema = z.object({
-  paymentMethod: z.enum(["COD", "STRIPE"]),
+  paymentMethod: z.enum(["COD", "STRIPE", "JAZZCASH"]),
   address: addressSchema,
   saveAddress: z.boolean().optional(),
-  notes: z.string().max(500).optional()
+  notes: z.string().max(500).optional(),
+  redeemLoyaltyPoints: z.boolean().optional(),
+  jazzCashMobile: z.string().max(20).optional()
 });
 
 export const orderIdParamsSchema = z.object({

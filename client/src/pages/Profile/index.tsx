@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import AddressManager from "../../components/profile/AddressManager";
 import ChangePasswordForm from "../../components/profile/ChangePasswordForm";
 import LogoutSection from "../../components/profile/LogoutSection";
+import LoyaltyPanel from "../../components/profile/LoyaltyPanel";
 import { useAuthStore } from "../../store/authStore";
 
-const tabs = ["Personal Info", "Addresses", "Orders", "Security"] as const;
+const tabs = ["Personal Info", "Addresses", "Orders", "Loyalty", "Security"] as const;
 
 export default function ProfilePage() {
   const user = useAuthStore((state) => state.user);
@@ -61,6 +62,8 @@ export default function ProfilePage() {
             </Link>
           </div>
         ) : null}
+
+        {activeTab === "Loyalty" ? <LoyaltyPanel /> : null}
 
         {activeTab === "Security" ? (
           <div className="space-y-8">

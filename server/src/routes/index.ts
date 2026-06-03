@@ -13,6 +13,7 @@ import userRoutes from "./user.routes.js";
 import blogRoutes from "./blog.routes.js";
 import reviewRoutes from "./review.routes.js";
 import scentDiaryRoutes from "./scentDiary.routes.js";
+import paymentRoutes from "./payment.routes.js";
 
 const router = Router();
 
@@ -29,6 +30,7 @@ router.use("/users", userRoutes);
 router.use("/blog", blogRoutes);
 router.use("/reviews", reviewRoutes);
 router.use("/scent-diary", scentDiaryRoutes);
+router.use("/payments", paymentRoutes);
 
 router.get("/health", (_req, res) => {
   res.json(
