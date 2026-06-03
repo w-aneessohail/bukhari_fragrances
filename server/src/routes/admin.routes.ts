@@ -18,8 +18,10 @@ import { createProductSchema, productIdParamsSchema, updateProductSchema } from 
 import {
   createProductController,
   deleteProductController,
-  updateProductController
+  updateProductController,
+  uploadImagesController
 } from "../controllers/product.controller.js";
+import { uploadMultipleDynamic } from "../middleware/upload.middleware.js";
 import { createBlogPostSchema, blogIdParamsSchema } from "../validators/blog.validator.js";
 import { adminCreate, adminDelete, adminList } from "../controllers/blog.controller.js";
 
@@ -46,6 +48,12 @@ router.delete(
   "/products/:id",
   validateParams(productIdParamsSchema),
   asyncHandler(deleteProductController)
+);
+router.post(
+  "/products/:id/images",
+  validateParams(productIdParamsSchema),
+  uploadMultipleDynamic((req) => `products/${req.params.id}`),
+  asyncHandler(uploadImagesController)
 );
 router.get("/orders", validateQuery(adminListQuerySchema), asyncHandler(listOrders));
 router.patch(

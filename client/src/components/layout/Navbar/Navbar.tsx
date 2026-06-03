@@ -33,6 +33,7 @@ export default function Navbar({ isScrolled }: NavbarProps) {
           <Link to="/shop">Shop</Link>
           <Link to="/about">About</Link>
           <Link to="/blog">Blog</Link>
+          <Link to="/gift-builder">Gifts</Link>
           <Link to="/contact">Contact</Link>
         </nav>
 

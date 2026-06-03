@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import ProductForm from "../../../components/admin/ProductForm";
+import ProductImageUpload from "../../../components/admin/ProductImageUpload";
 import {
   createAdminProduct,
   deactivateAdminProduct,
@@ -103,6 +104,11 @@ export default function AdminProductsPage() {
       {editingProduct ? (
         <div className="mt-8">
           <h2 className="mb-4 font-heading text-xl text-text-primary">Edit {editingProduct.name}</h2>
+          <ProductImageUpload
+            productId={editingProduct.id}
+            onUploaded={() => queryClient.invalidateQueries({ queryKey: ["admin-products"] })}
+          />
+
           <ProductForm
             categories={categories}
             initial={{

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCheckoutSummary, placeOrder } from "../../services/orderService";
+import { fetchAddresses, type Address } from "../../services/userService";
+import { readGiftNotes } from "../GiftBuilder";
 import { useCartStore } from "../../store/cartStore";
 import type { CreateOrderInput } from "../../types/order.types";
 
@@ -29,11 +31,34 @@ export default function CheckoutPage() {
     queryFn: fetchCheckoutSummary
   });
 
+  const { data: savedAddresses = [] } = useQuery({
+    queryKey: ["addresses"],
+    queryFn: fetchAddresses
+  });
+
   useEffect(() => {
     if (isError) {
       navigate("/cart", { replace: true });
     }
   }, [isError, navigate]);
+
+  useEffect(() => {
+    const giftNotes = readGiftNotes();
+    if (giftNotes) {
+      setNotes((current) => (current ? current : giftNotes));
+    }
+  }, []);
+
+  const applySavedAddress = (saved: Address) => {
+    setAddress({
+      label: saved.label,
+      street: saved.street,
+      area: saved.area,
+      city: saved.city,
+      province: saved.province,
+      postalCode: saved.postalCode
+    });
+  };
 
   const updateAddress = (field: keyof typeof emptyAddress, value: string) => {
     setAddress((current) => ({ ...current, [field]: value }));
@@ -84,6 +109,26 @@ export default function CheckoutPage() {
 
       <fieldset className="space-y-4">
         <legend className="font-heading text-xl text-text-primary">Shipping address</legend>
+
+        {savedAddresses.length > 0 ? (
+          <div className="space-y-2">
+            <p className="text-sm text-text-secondary">Use a saved address</p>
+            <div className="flex flex-wrap gap-2">
+              {savedAddresses.map((saved) => (
+                <button
+                  key={saved.id}
+                  type="button"
+                  onClick={() => applySavedAddress(saved)}
+                  className="rounded-lg border border-border px-3 py-2 text-sm hover:border-accent-gold"
+                >
+                  {saved.label}
+                  {saved.isDefault ? " (default)" : ""}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm">
             <span className="text-text-secondary">Label</span>

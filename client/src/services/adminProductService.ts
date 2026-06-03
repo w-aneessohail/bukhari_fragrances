@@ -47,3 +47,17 @@ export async function updateAdminProduct(id: string, input: AdminProductUpdate) 
 export async function deactivateAdminProduct(id: string) {
   await api.delete(`/admin/products/${id}`);
 }
+
+export async function uploadAdminProductImages(productId: string, files: FileList | File[]) {
+  const formData = new FormData();
+  const list = Array.from(files);
+  list.forEach((file) => formData.append("images", file));
+
+  const response = await api.post<{ data: { url: string }[] }>(
+    `/admin/products/${productId}/images`,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+
+  return response.data.data;
+}
