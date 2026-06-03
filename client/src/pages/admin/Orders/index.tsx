@@ -1,5 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchAdminOrders, updateAdminOrderStatus } from "../../../services/adminService";
+import { useState } from "react";
+import {
+  exportAdminOrdersCsv,
+  fetchAdminOrders,
+  updateAdminOrderStatus
+} from "../../../services/adminService";
 
 const statuses = [
   "PENDING",
@@ -18,10 +23,12 @@ function formatLabel(value: string) {
 
 export default function AdminOrdersPage() {
   const queryClient = useQueryClient();
+  const [statusFilter, setStatusFilter] = useState("");
+  const [search, setSearch] = useState("");
 
   const { data: response, isLoading } = useQuery({
-    queryKey: ["admin-orders"],
-    queryFn: () => fetchAdminOrders(1, 50)
+    queryKey: ["admin-orders", statusFilter, search],
+    queryFn: () => fetchAdminOrders(1, 50, { status: statusFilter || undefined, search: search || undefined })
   });
 
   const updateMutation = useMutation({
@@ -32,15 +39,58 @@ export default function AdminOrdersPage() {
 
   const orders = response?.data ?? [];
 
+  const handleExport = async () => {
+    const csv = await exportAdminOrdersCsv({ status: statusFilter || undefined, search: search || undefined });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "bukhari-orders.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
-      <h1 className="font-heading text-3xl text-accent-gold">Orders</h1>
-      <p className="mt-2 text-text-secondary">Update fulfillment status for customer orders.</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-heading text-3xl text-accent-gold">Orders</h1>
+          <p className="mt-2 text-text-secondary">Update fulfillment status for customer orders.</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleExport}
+          className="rounded-lg border border-border px-4 py-2 text-sm hover:border-accent-gold hover:text-accent-gold"
+        >
+          Export CSV
+        </button>
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <select
+          value={statusFilter}
+          onChange={(event) => setStatusFilter(event.target.value)}
+          className="rounded-md border border-border bg-input px-3 py-2 text-sm"
+        >
+          <option value="">All statuses</option>
+          {statuses.map((status) => (
+            <option key={status} value={status}>
+              {formatLabel(status)}
+            </option>
+          ))}
+        </select>
+        <input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search order # or customer"
+          className="min-w-[220px] rounded-md border border-border bg-input px-3 py-2 text-sm"
+        />
+      </div>
 
       {isLoading ? (
         <p className="mt-8 text-text-secondary">Loading orders…</p>
       ) : orders.length === 0 ? (
-        <p className="mt-8 text-text-secondary">No orders yet.</p>
+        <p className="mt-8 text-text-secondary">No orders found.</p>
       ) : (
         <div className="mt-8 overflow-x-auto rounded-xl border border-border">
           <table className="min-w-full text-left text-sm">

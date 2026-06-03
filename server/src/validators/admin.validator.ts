@@ -21,5 +21,7 @@ export const orderIdParamsSchema = z.object({
 
 export const adminListQuerySchema = z.object({
   page: z.string().optional(),
-  limit: z.string().optional()
+  limit: z.string().optional(),
+  status: orderStatusEnum.optional(),
+  search: z.string().optional()
 });

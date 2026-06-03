@@ -1,6 +1,8 @@
+import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import ProductCard from "../product/ProductCard";
+import { fadeUp, staggerContainer } from "../../utils/animations";
 import type { ProductSummary } from "../../types/product.types";
 
 type ProductSectionProps = {
@@ -42,11 +44,19 @@ export default function ProductSection({ title, subtitle, queryKey, fetcher, sho
           ))}
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        >
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <motion.div key={product.id} variants={fadeUp}>
+              <ProductCard product={product} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </section>
   );

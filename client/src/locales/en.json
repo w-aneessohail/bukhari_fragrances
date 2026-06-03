@@ -1,0 +1,24 @@
+{
+  "brand": "Bukhari Perfumes",
+  "nav": {
+    "shop": "Shop",
+    "about": "About",
+    "blog": "Blog",
+    "gifts": "Gifts",
+    "contact": "Contact",
+    "cart": "Cart",
+    "account": "Account",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "wishlist": "Wishlist",
+    "admin": "Admin"
+  },
+  "hero": {
+    "explore": "Explore collection",
+    "findScent": "Find your scent"
+  },
+  "common": {
+    "loading": "Loading…",
+    "continueShopping": "Continue shopping"
+  }
+}

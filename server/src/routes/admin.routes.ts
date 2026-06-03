@@ -9,6 +9,7 @@ import {
 } from "../validators/admin.validator.js";
 import {
   dashboardStats,
+  exportOrdersController,
   listAdminProducts,
   listOrders,
   listUsersController,
@@ -67,6 +68,7 @@ router.post(
   asyncHandler(uploadImagesController)
 );
 router.get("/orders", validateQuery(adminListQuerySchema), asyncHandler(listOrders));
+router.get("/orders/export", validateQuery(adminListQuerySchema), asyncHandler(exportOrdersController));
 router.patch(
   "/orders/:id/status",
   validateParams(orderIdParamsSchema),

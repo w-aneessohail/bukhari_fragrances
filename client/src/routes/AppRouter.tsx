@@ -32,6 +32,8 @@ const AdminOrdersPage = lazy(() => import("../pages/admin/Orders"));
 const AdminUsersPage = lazy(() => import("../pages/admin/Users"));
 const AdminBlogPage = lazy(() => import("../pages/admin/Blog"));
 const AdminDiscountsPage = lazy(() => import("../pages/admin/Discounts"));
+const SearchPage = lazy(() => import("../pages/Search"));
+const OfflinePage = lazy(() => import("../pages/Offline"));
 
 function RouteFallback() {
   return (
@@ -49,6 +51,8 @@ export default function AppRouter() {
           <Route element={<MainLayout />}>
             <Route index element={<HomePage />} />
             <Route path="shop" element={<ShopPage />} />
+            <Route path="search" element={<SearchPage />} />
+            <Route path="offline" element={<OfflinePage />} />
             <Route path="product/:slug" element={<ProductDetailPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />

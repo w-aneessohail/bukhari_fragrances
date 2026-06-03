@@ -11,3 +11,21 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
 }
+
+@keyframes hero-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #1a1a2e 0%, #2a1f1a 45%, #1a1a2e 100%);
+  background-size: 200% 200%;
+  animation: hero-gradient-shift 12s ease infinite;
+}

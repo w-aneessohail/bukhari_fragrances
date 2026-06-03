@@ -1,11 +1,15 @@
 import HeroSection from "../../components/home/HeroSection";
 import CategoryStrip from "../../components/home/CategoryStrip";
 import ProductSection from "../../components/home/ProductSection";
-import BrandStory from "../../components/home/BrandStory";
+import StorySection from "../../components/home/StorySection";
+import FeaturedCollection from "../../components/home/FeaturedCollection";
+import IngredientsJourney from "../../components/home/IngredientsJourney";
 import ScentFinderSection from "../../components/home/ScentFinderSection";
 import TestimonialsSection from "../../components/home/TestimonialsSection";
 import NewsletterSection from "../../components/home/NewsletterSection";
 import PageMeta from "../../components/seo/PageMeta";
+import JsonLd from "../../components/seo/JsonLd";
+import { buildOrganizationJsonLd } from "../../utils/jsonLd";
 import {
   fetchBestsellerProducts,
   fetchFeaturedProducts,
@@ -20,8 +24,12 @@ export default function HomePage() {
         description="Discover oud, attar, and signature eau de parfum collections handcrafted by Bukhari Perfumes in Lahore."
         path="/"
       />
+      <JsonLd data={buildOrganizationJsonLd()} />
       <HeroSection />
       <CategoryStrip />
+      <FeaturedCollection />
+      <StorySection />
+      <IngredientsJourney />
       <ProductSection
         title="Featured fragrances"
         subtitle="Hand-picked selections from our master perfumers"
@@ -43,10 +51,11 @@ export default function HomePage() {
         fetcher={fetchNewArrivals}
         shopLink="/shop?sort=newest"
       />
-      <ScentFinderSection />
+      <div id="scent-finder">
+        <ScentFinderSection />
+      </div>
       <TestimonialsSection />
       <NewsletterSection />
-      <BrandStory />
     </>
   );
 }

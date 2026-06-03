@@ -15,6 +15,13 @@ export default function LoyaltyPanel() {
     return null;
   }
 
+  const milestones = [
+    { label: "Explorer", points: 100 },
+    { label: "Connoisseur", points: 500 },
+    { label: "Collector", points: 1000 },
+    { label: "Patron", points: 5000 }
+  ];
+
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-border bg-card p-6">
@@ -23,6 +30,21 @@ export default function LoyaltyPanel() {
         <p className="mt-1 text-sm text-text-secondary">
           Redeem {data.redemptionBlock} points for Rs. {data.redemptionValue} off at checkout.
         </p>
+        <div className="mt-6 flex flex-wrap gap-2">
+          {milestones.map((milestone) => {
+            const unlocked = data.balance >= milestone.points;
+            return (
+              <span
+                key={milestone.label}
+                className={`rounded-full border px-3 py-1 text-xs ${
+                  unlocked ? "border-accent-gold text-accent-gold" : "border-border text-text-secondary"
+                }`}
+              >
+                {milestone.label} · {milestone.points}
+              </span>
+            );
+          })}
+        </div>
       </div>
 
       {data.transactions.length > 0 ? (

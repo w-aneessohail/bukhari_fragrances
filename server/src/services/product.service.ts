@@ -3,6 +3,7 @@ import { prisma } from "../config/database.js";
 import { HttpError } from "../utils/httpError.js";
 import { buildPaginationMeta, parsePaginationParams } from "../utils/pagination.utils.js";
 import { decimalToNumber, mapProductSummary, slugify } from "../utils/product.utils.js";
+import { cacheGet, cacheSet } from "../utils/cache.utils.js";
 import type { productListQuerySchema } from "../validators/product.validator.js";
 import type { z } from "zod";
 
@@ -152,6 +153,18 @@ export async function getAdminProducts(query: { page?: string; limit?: string })
 }
 
 export async function getProducts(query: ProductListQuery) {
+  const cacheKey = `products:list:${JSON.stringify(query)}`;
+  const cached = await cacheGet<Awaited<ReturnType<typeof fetchProductsFromDb>>>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const result = await fetchProductsFromDb(query);
+  await cacheSet(cacheKey, result, 300);
+  return result;
+}
+
+async function fetchProductsFromDb(query: ProductListQuery) {
   const { page, limit, skip } = parsePaginationParams(query);
   const where = buildWhere(query);
 

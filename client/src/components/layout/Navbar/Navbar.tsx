@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import i18n from "../../../i18n";
 import { ThemeMode } from "../../../enums/ThemeMode";
 import { logoutUser } from "../../../services/authService";
 import { useAuthStore } from "../../../store/authStore";
@@ -15,6 +17,7 @@ type NavbarProps = {
 
 export default function Navbar({ isScrolled }: NavbarProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { theme, setTheme } = useThemeStore();
   const itemCount = useCartStore((state) => state.cart.itemCount);
   const openCartDrawer = useCartDrawerStore((state) => state.open);
@@ -29,6 +32,13 @@ export default function Navbar({ isScrolled }: NavbarProps) {
     navigate("/");
   };
 
+  const switchLanguage = (lang: "en" | "ur") => {
+    void i18n.changeLanguage(lang);
+    localStorage.setItem("bukhari-lang", lang);
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "ur" ? "rtl" : "ltr";
+  };
+
   return (
     <header
       className={`sticky top-0 z-40 border-b border-border transition-all ${
@@ -41,14 +51,30 @@ export default function Navbar({ isScrolled }: NavbarProps) {
         </Link>
 
         <nav className="hidden items-center gap-6 font-body text-sm text-text-secondary md:flex">
-          <Link to="/shop">Shop</Link>
-          <Link to="/about">About</Link>
-          <Link to="/blog">Blog</Link>
-          <Link to="/gift-builder">Gifts</Link>
-          <Link to="/contact">Contact</Link>
+          <Link to="/shop">{t("nav.shop")}</Link>
+          <Link to="/about">{t("nav.about")}</Link>
+          <Link to="/blog">{t("nav.blog")}</Link>
+          <Link to="/gift-builder">{t("nav.gifts")}</Link>
+          <Link to="/contact">{t("nav.contact")}</Link>
         </nav>
 
         <div className="flex items-center gap-3">
+          <div className="hidden items-center gap-1 text-xs md:flex">
+            <button
+              type="button"
+              onClick={() => switchLanguage("en")}
+              className={`rounded px-2 py-1 ${i18n.language === "en" ? "bg-accent-gold text-bg-primary" : "text-text-secondary"}`}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              onClick={() => switchLanguage("ur")}
+              className={`rounded px-2 py-1 ${i18n.language === "ur" ? "bg-accent-gold text-bg-primary" : "text-text-secondary"}`}
+            >
+              UR
+            </button>
+          </div>
           <SearchBar />
 
           <button
@@ -57,7 +83,7 @@ export default function Navbar({ isScrolled }: NavbarProps) {
             className="relative text-sm text-text-secondary hover:text-accent-gold"
             aria-label="Open cart"
           >
-            Cart
+            {t("nav.cart")}
             {itemCount > 0 ? (
               <motion.span
                 animate={badgePulse ? { scale: [1, 1.35, 1] } : { scale: 1 }}

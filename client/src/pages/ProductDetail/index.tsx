@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReviewForm, { ReviewList } from "../../components/product/ReviewForm";
 import PageMeta from "../../components/seo/PageMeta";
+import JsonLd from "../../components/seo/JsonLd";
+import { buildProductJsonLd } from "../../utils/jsonLd";
 import { useCartStore } from "../../store/cartStore";
 import { fetchMyProductReview } from "../../services/reviewService";
 import ProductCard from "../../components/product/ProductCard";
@@ -122,6 +124,7 @@ export default function ProductDetailPage() {
         image={product.mainImage ?? undefined}
         path={`/product/${product.slug}`}
       />
+      <JsonLd data={buildProductJsonLd(product)} />
       <nav className="mb-6 text-sm text-text-secondary">
         <Link to="/shop" className="hover:text-accent-gold">
           Shop

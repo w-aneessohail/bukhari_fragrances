@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { ApiResponse } from "../utils/response.utils.js";
 import {
   getDashboardStats,
+  exportOrdersCsv,
   listAllOrders,
   listUsers,
   updateOrderStatus
@@ -64,4 +65,15 @@ export async function listUsersController(req: Request, res: Response) {
       pagination: result.pagination
     })
   );
+}
+
+export async function exportOrdersController(req: Request, res: Response) {
+  const csv = await exportOrdersCsv({
+    status: typeof req.query.status === "string" ? req.query.status : undefined,
+    search: typeof req.query.search === "string" ? req.query.search : undefined
+  });
+
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", 'attachment; filename="bukhari-orders.csv"');
+  res.send(csv);
 }
