@@ -476,6 +476,53 @@ async function main() {
     }
   });
 
+  const oudProduct = await prisma.product.findUnique({ where: { slug: "bukhari-oud-royale" } });
+  const roseProduct = await prisma.product.findUnique({ where: { slug: "rosewood-attar" } });
+
+  if (oudProduct) {
+    await prisma.review.upsert({
+      where: {
+        userId_productId: { userId: customerUser.id, productId: oudProduct.id }
+      },
+      update: {
+        rating: 5,
+        comment: "Bukhari Oud Royale is my signature scent — rich, lasting, and unmistakably premium.",
+        isVerified: true,
+        helpfulCount: 12
+      },
+      create: {
+        userId: customerUser.id,
+        productId: oudProduct.id,
+        rating: 5,
+        comment: "Bukhari Oud Royale is my signature scent — rich, lasting, and unmistakably premium.",
+        isVerified: true,
+        helpfulCount: 12
+      }
+    });
+  }
+
+  if (roseProduct) {
+    await prisma.review.upsert({
+      where: {
+        userId_productId: { userId: adminUser.id, productId: roseProduct.id }
+      },
+      update: {
+        rating: 5,
+        comment: "Rosewood Attar is elegant and beautifully balanced for Lahore evenings.",
+        isVerified: true,
+        helpfulCount: 8
+      },
+      create: {
+        userId: adminUser.id,
+        productId: roseProduct.id,
+        rating: 5,
+        comment: "Rosewood Attar is elegant and beautifully balanced for Lahore evenings.",
+        isVerified: true,
+        helpfulCount: 8
+      }
+    });
+  }
+
   await prisma.blogPost.upsert({
     where: { slug: "discover-your-signature-scent" },
     update: {

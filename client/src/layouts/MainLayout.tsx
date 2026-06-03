@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Footer from "../components/layout/Footer/Footer";
 import Navbar from "../components/layout/Navbar/Navbar";
+import CartDrawer from "../components/cart/CartDrawer";
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
 import { useWishlistStore } from "../store/wishlistStore";
@@ -34,6 +35,7 @@ export default function MainLayout() {
       <Navbar isScrolled={isScrolled} />
       <Outlet />
       <Footer />
+      <CartDrawer />
     </div>
   );
 }

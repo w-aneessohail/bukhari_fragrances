@@ -2,6 +2,8 @@ import HeroSection from "../../components/home/HeroSection";
 import CategoryStrip from "../../components/home/CategoryStrip";
 import ProductSection from "../../components/home/ProductSection";
 import BrandStory from "../../components/home/BrandStory";
+import ScentFinderSection from "../../components/home/ScentFinderSection";
+import TestimonialsSection from "../../components/home/TestimonialsSection";
 import {
   fetchBestsellerProducts,
   fetchFeaturedProducts,
@@ -34,6 +36,8 @@ export default function HomePage() {
         fetcher={fetchNewArrivals}
         shopLink="/shop?sort=newest"
       />
+      <ScentFinderSection />
+      <TestimonialsSection />
       <BrandStory />
     </>
   );

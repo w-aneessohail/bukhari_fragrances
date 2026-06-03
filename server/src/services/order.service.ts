@@ -340,3 +340,111 @@ export async function getUserOrder(userId: string, orderId: string) {
 
   return mapOrder(order);
 }
+
+const TRACKING_STEPS = [
+  { status: "PENDING", label: "Order placed", icon: "shopping-bag" },
+  { status: "CONFIRMED", label: "Order confirmed", icon: "check" },
+  { status: "PROCESSING", label: "Being prepared", icon: "package" },
+  { status: "SHIPPED", label: "Shipped", icon: "truck" },
+  { status: "OUT_FOR_DELIVERY", label: "Out for delivery", icon: "map-pin" },
+  { status: "DELIVERED", label: "Delivered", icon: "home" }
+] as const;
+
+const STATUS_ORDER = TRACKING_STEPS.map((step) => step.status);
+
+function buildOrderTimeline(order: { status: string; createdAt: Date; updatedAt: Date }) {
+  if (order.status === "CANCELLED" || order.status === "REFUNDED") {
+    return [
+      {
+        status: order.status,
+        label: order.status === "CANCELLED" ? "Order cancelled" : "Order refunded",
+        icon: "x",
+        completed: true,
+        active: true,
+        timestamp: order.updatedAt.toISOString()
+      }
+    ];
+  }
+
+  const currentIndex = STATUS_ORDER.indexOf(order.status as (typeof STATUS_ORDER)[number]);
+
+  return TRACKING_STEPS.map((step, index) => {
+    const completed = currentIndex >= index && currentIndex !== -1;
+    const active = order.status === step.status;
+
+    return {
+      status: step.status,
+      label: step.label,
+      icon: step.icon,
+      completed,
+      active,
+      timestamp: completed ? (index === 0 ? order.createdAt.toISOString() : order.updatedAt.toISOString()) : null
+    };
+  });
+}
+
+export async function getOrderTracking(userId: string, orderId: string) {
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, userId },
+    include: {
+      items: { include: { product: { select: { slug: true } } } }
+    }
+  });
+
+  if (!order) {
+    throw new HttpError("Order not found", 404);
+  }
+
+  return {
+    order: mapOrder(order),
+    timeline: buildOrderTimeline(order),
+    canCancel: order.status === "PENDING" || order.status === "CONFIRMED"
+  };
+}
+
+export async function cancelUserOrder(userId: string, orderId: string) {
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, userId },
+    include: { items: true }
+  });
+
+  if (!order) {
+    throw new HttpError("Order not found", 404);
+  }
+
+  if (order.status !== "PENDING" && order.status !== "CONFIRMED") {
+    throw new HttpError("This order can no longer be cancelled", 400);
+  }
+
+  await prisma.$transaction(async (tx) => {
+    for (const item of order.items) {
+      if (item.sizeLabel) {
+        const sizeMl = Number.parseInt(item.sizeLabel, 10);
+        if (!Number.isNaN(sizeMl)) {
+          const size = await tx.productSize.findFirst({
+            where: { productId: item.productId, sizeMl }
+          });
+          if (size) {
+            await tx.productSize.update({
+              where: { id: size.id },
+              data: { stock: { increment: item.quantity } }
+            });
+            continue;
+          }
+        }
+      }
+
+      await tx.product.update({
+        where: { id: item.productId },
+        data: { stock: { increment: item.quantity } }
+      });
+    }
+
+    await tx.order.update({
+      where: { id: order.id },
+      data: { status: "CANCELLED" }
+    });
+  });
+
+  return getOrderTracking(userId, orderId);
+}

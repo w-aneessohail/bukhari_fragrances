@@ -31,6 +31,7 @@ const AdminProductsPage = lazy(() => import("../pages/admin/Products"));
 const AdminOrdersPage = lazy(() => import("../pages/admin/Orders"));
 const AdminUsersPage = lazy(() => import("../pages/admin/Users"));
 const AdminBlogPage = lazy(() => import("../pages/admin/Blog"));
+const AdminDiscountsPage = lazy(() => import("../pages/admin/Discounts"));
 
 function RouteFallback() {
   return (
@@ -85,6 +86,7 @@ export default function AppRouter() {
               <Route path="orders" element={<AdminOrdersPage />} />
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="blog" element={<AdminBlogPage />} />
+              <Route path="discounts" element={<AdminDiscountsPage />} />
             </Route>
           </Route>
 

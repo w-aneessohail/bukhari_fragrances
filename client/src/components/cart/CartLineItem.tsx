@@ -6,16 +6,29 @@ type CartLineItemProps = {
   onUpdateQuantity: (quantity: number) => void;
   onRemove: () => void;
   isUpdating?: boolean;
+  compact?: boolean;
 };
 
-export default function CartLineItem({ item, onUpdateQuantity, onRemove, isUpdating }: CartLineItemProps) {
+export default function CartLineItem({
+  item,
+  onUpdateQuantity,
+  onRemove,
+  isUpdating,
+  compact = false
+}: CartLineItemProps) {
   const maxStock = item.size?.stock ?? item.product.stock;
 
   return (
-    <article className="flex gap-4 rounded-xl border border-border bg-card p-4">
+    <article
+      className={`flex gap-4 rounded-xl border border-border bg-card ${
+        compact ? "p-3" : "p-4"
+      }`}
+    >
       <Link
         to={`/product/${item.product.slug}`}
-        className="h-28 w-20 shrink-0 overflow-hidden rounded-lg bg-bg-secondary"
+        className={`shrink-0 overflow-hidden rounded-lg bg-bg-secondary ${
+          compact ? "h-20 w-16" : "h-28 w-20"
+        }`}
       >
         {item.product.mainImage ? (
           <img src={item.product.mainImage} alt={item.product.name} className="h-full w-full object-cover" />
@@ -26,7 +39,9 @@ export default function CartLineItem({ item, onUpdateQuantity, onRemove, isUpdat
 
       <div className="flex min-w-0 flex-1 flex-col justify-between">
         <div>
-          <Link to={`/product/${item.product.slug}`} className="font-heading text-lg text-text-primary hover:text-accent-gold">
+          <Link to={`/product/${item.product.slug}`} className={`font-heading hover:text-accent-gold ${
+            compact ? "text-base text-text-primary" : "text-lg text-text-primary"
+          }`}>
             {item.product.name}
           </Link>
           {item.size ? (

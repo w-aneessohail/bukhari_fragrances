@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import ReviewForm, { ReviewList } from "../../components/product/ReviewForm";
 import { useCartStore } from "../../store/cartStore";
+import { fetchMyProductReview } from "../../services/reviewService";
 import ProductCard from "../../components/product/ProductCard";
 import ProductGallery from "../../components/product/ProductGallery";
 import ScentNoteWheel from "../../components/product/ScentNoteWheel";
@@ -22,10 +24,16 @@ export default function ProductDetailPage() {
   const addItem = useCartStore((state) => state.addItem);
   const cartError = useCartStore((state) => state.error);
 
-  const { data: product, isLoading, isError } = useQuery({
+  const { data: product, isLoading, isError, refetch } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => fetchProductBySlug(slug!),
     enabled: Boolean(slug)
+  });
+
+  const { data: myReview } = useQuery({
+    queryKey: ["my-review", product?.id],
+    queryFn: () => fetchMyProductReview(product!.id),
+    enabled: Boolean(product?.id)
   });
 
   useEffect(() => {
@@ -205,26 +213,12 @@ export default function ProductDetailPage() {
 
         <div>
           <h2 className="font-heading text-2xl text-accent-gold">Reviews</h2>
-          {product.reviews.length === 0 ? (
-            <p className="mt-4 text-sm text-text-secondary">No reviews yet. Be the first to share your experience.</p>
-          ) : (
-            <ul className="mt-4 space-y-4">
-              {product.reviews.map((review) => (
-                <li key={review.id} className="rounded-lg border border-border bg-card p-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-text-primary">{review.user.name}</span>
-                    <span className="text-sm text-accent-gold">{review.rating} ★</span>
-                  </div>
-                  {review.comment ? (
-                    <p className="mt-2 text-sm text-text-secondary">{review.comment}</p>
-                  ) : null}
-                  {review.isVerified ? (
-                    <p className="mt-2 text-xs text-text-secondary">Verified purchase</p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )}
+          <ReviewForm
+            productId={product.id}
+            existingReview={myReview}
+            onSubmitted={() => refetch()}
+          />
+          <ReviewList reviews={product.reviews} onHelpful={() => refetch()} />
         </div>
       </div>
 

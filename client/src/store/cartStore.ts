@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import * as cartService from "../services/cartService";
+import { useCartDrawerStore } from "./cartDrawerStore";
 import type { Cart } from "../types/cart.types";
 
 const emptyCart: Cart = {
@@ -49,6 +50,8 @@ export const useCartStore = create<CartState>((set) => ({
     try {
       const cart = await cartService.addToCart(input);
       set({ cart });
+      useCartDrawerStore.getState().pulseBadge();
+      useCartDrawerStore.getState().open();
     } catch (error) {
       const axiosMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       const message = axiosMessage ?? "Could not add to cart";

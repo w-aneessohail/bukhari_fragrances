@@ -1,7 +1,9 @@
+import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeMode } from "../../../enums/ThemeMode";
 import { logoutUser } from "../../../services/authService";
 import { useAuthStore } from "../../../store/authStore";
+import { useCartDrawerStore } from "../../../store/cartDrawerStore";
 import { useCartStore } from "../../../store/cartStore";
 import { useWishlistStore } from "../../../store/wishlistStore";
 import { useThemeStore } from "../../../store/themeStore";
@@ -15,6 +17,8 @@ export default function Navbar({ isScrolled }: NavbarProps) {
   const navigate = useNavigate();
   const { theme, setTheme } = useThemeStore();
   const itemCount = useCartStore((state) => state.cart.itemCount);
+  const openCartDrawer = useCartDrawerStore((state) => state.open);
+  const badgePulse = useCartDrawerStore((state) => state.badgePulse);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const wishlistCount = useWishlistStore((state) => state.items.length);
   const user = useAuthStore((state) => state.user);
@@ -47,14 +51,23 @@ export default function Navbar({ isScrolled }: NavbarProps) {
         <div className="flex items-center gap-3">
           <SearchBar />
 
-          <Link to="/cart" className="relative text-sm text-text-secondary hover:text-accent-gold">
+          <button
+            type="button"
+            onClick={openCartDrawer}
+            className="relative text-sm text-text-secondary hover:text-accent-gold"
+            aria-label="Open cart"
+          >
             Cart
             {itemCount > 0 ? (
-              <span className="absolute -right-3 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-gold px-1 text-xs font-semibold text-bg-primary">
+              <motion.span
+                animate={badgePulse ? { scale: [1, 1.35, 1] } : { scale: 1 }}
+                transition={{ duration: 0.4 }}
+                className="absolute -right-3 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-gold px-1 text-xs font-semibold text-bg-primary"
+              >
                 {itemCount > 99 ? "99+" : itemCount}
-              </span>
+              </motion.span>
             ) : null}
-          </Link>
+          </button>
 
           {isAdmin ? (
             <Link to="/admin" className="text-sm text-text-secondary hover:text-accent-gold">

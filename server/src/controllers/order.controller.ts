@@ -2,7 +2,9 @@ import type { Request, Response } from "express";
 import { ApiResponse } from "../utils/response.utils.js";
 import {
   createOrderFromCart,
+  cancelUserOrder,
   getCheckoutSummary,
+  getOrderTracking,
   getUserOrder,
   listUserOrders
 } from "../services/order.service.js";
@@ -68,6 +70,38 @@ export async function getOrder(req: Request, res: Response) {
       success: true,
       message: "Order retrieved",
       data: order
+    })
+  );
+}
+
+export async function trackOrder(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new HttpError("Authentication required", 401);
+  }
+
+  const tracking = await getOrderTracking(userId, req.params.id);
+  res.json(
+    new ApiResponse({
+      success: true,
+      message: "Order tracking retrieved",
+      data: tracking
+    })
+  );
+}
+
+export async function cancelOrder(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new HttpError("Authentication required", 401);
+  }
+
+  const tracking = await cancelUserOrder(userId, req.params.id);
+  res.json(
+    new ApiResponse({
+      success: true,
+      message: "Order cancelled",
+      data: tracking
     })
   );
 }

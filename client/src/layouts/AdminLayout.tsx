@@ -8,7 +8,8 @@ const adminLinks = [
   { to: "/admin/products", label: "Products" },
   { to: "/admin/orders", label: "Orders" },
   { to: "/admin/users", label: "Users" },
-  { to: "/admin/blog", label: "Blog" }
+  { to: "/admin/blog", label: "Blog" },
+  { to: "/admin/discounts", label: "Discounts" }
 ];
 
 export default function AdminLayout() {

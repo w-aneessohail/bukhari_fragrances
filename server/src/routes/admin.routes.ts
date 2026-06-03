@@ -24,6 +24,17 @@ import {
 import { uploadMultipleDynamic } from "../middleware/upload.middleware.js";
 import { createBlogPostSchema, blogIdParamsSchema } from "../validators/blog.validator.js";
 import { adminCreate, adminDelete, adminList } from "../controllers/blog.controller.js";
+import {
+  createDiscountSchema,
+  discountIdParamsSchema,
+  updateDiscountSchema
+} from "../services/discount.service.js";
+import {
+  createDiscountController,
+  deleteDiscountController,
+  listDiscountsController,
+  updateDiscountController
+} from "../controllers/discount.controller.js";
 
 const router = Router();
 
@@ -67,5 +78,19 @@ router.get("/users", validateQuery(adminListQuerySchema), asyncHandler(listUsers
 router.get("/blog", asyncHandler(adminList));
 router.post("/blog", validateBody(createBlogPostSchema), asyncHandler(adminCreate));
 router.delete("/blog/:id", validateParams(blogIdParamsSchema), asyncHandler(adminDelete));
+
+router.get("/discounts", asyncHandler(listDiscountsController));
+router.post("/discounts", validateBody(createDiscountSchema), asyncHandler(createDiscountController));
+router.patch(
+  "/discounts/:id",
+  validateParams(discountIdParamsSchema),
+  validateBody(updateDiscountSchema),
+  asyncHandler(updateDiscountController)
+);
+router.delete(
+  "/discounts/:id",
+  validateParams(discountIdParamsSchema),
+  asyncHandler(deleteDiscountController)
+);
 
 export default router;
