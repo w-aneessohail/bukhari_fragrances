@@ -9,10 +9,17 @@ import {
 } from "../validators/admin.validator.js";
 import {
   dashboardStats,
+  listAdminProducts,
   listOrders,
   listUsersController,
   patchOrderStatus
 } from "../controllers/admin.controller.js";
+import { createProductSchema, productIdParamsSchema, updateProductSchema } from "../validators/product.validator.js";
+import {
+  createProductController,
+  deleteProductController,
+  updateProductController
+} from "../controllers/product.controller.js";
 import { createBlogPostSchema, blogIdParamsSchema } from "../validators/blog.validator.js";
 import { adminCreate, adminDelete, adminList } from "../controllers/blog.controller.js";
 
@@ -27,6 +34,19 @@ const asyncHandler = (handler: RequestHandler): RequestHandler => {
 router.use(verifyAccessToken, requireAdmin);
 
 router.get("/stats", asyncHandler(dashboardStats));
+router.get("/products", validateQuery(adminListQuerySchema), asyncHandler(listAdminProducts));
+router.post("/products", validateBody(createProductSchema), asyncHandler(createProductController));
+router.put(
+  "/products/:id",
+  validateParams(productIdParamsSchema),
+  validateBody(updateProductSchema),
+  asyncHandler(updateProductController)
+);
+router.delete(
+  "/products/:id",
+  validateParams(productIdParamsSchema),
+  asyncHandler(deleteProductController)
+);
 router.get("/orders", validateQuery(adminListQuerySchema), asyncHandler(listOrders));
 router.patch(
   "/orders/:id/status",

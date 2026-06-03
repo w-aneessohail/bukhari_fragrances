@@ -6,6 +6,7 @@ import {
   listUsers,
   updateOrderStatus
 } from "../services/admin.service.js";
+import { getAdminProducts } from "../services/product.service.js";
 
 export async function dashboardStats(_req: Request, res: Response) {
   const stats = await getDashboardStats();
@@ -37,6 +38,18 @@ export async function patchOrderStatus(req: Request, res: Response) {
       success: true,
       message: "Order status updated",
       data: order
+    })
+  );
+}
+
+export async function listAdminProducts(req: Request, res: Response) {
+  const result = await getAdminProducts(req.query);
+  res.json(
+    new ApiResponse({
+      success: true,
+      message: "Products retrieved",
+      data: result.items,
+      pagination: result.pagination
     })
   );
 }

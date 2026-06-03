@@ -132,6 +132,25 @@ const productListInclude = {
   _count: { select: { reviews: true, orderItems: true } }
 } satisfies Prisma.ProductInclude;
 
+export async function getAdminProducts(query: { page?: string; limit?: string }) {
+  const { page, limit, skip } = parsePaginationParams(query);
+
+  const [items, totalItems] = await Promise.all([
+    prisma.product.findMany({
+      include: productListInclude,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit
+    }),
+    prisma.product.count()
+  ]);
+
+  return {
+    items: items.map(mapProductSummary),
+    pagination: buildPaginationMeta({ page, limit, totalItems })
+  };
+}
+
 export async function getProducts(query: ProductListQuery) {
   const { page, limit, skip } = parsePaginationParams(query);
   const where = buildWhere(query);
