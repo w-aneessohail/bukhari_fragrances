@@ -29,3 +29,9 @@ pnpm-debug.log*
 Thumbs.db
 .idea/
 .vscode/
+
+# project planning documents (local reference only)
+1_Architecture.docx
+2_Development_Plan.docx
+3_Build_Prompts.docx
+_plan_extract.txt
