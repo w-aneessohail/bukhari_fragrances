@@ -457,6 +457,25 @@ async function main() {
     });
   }
 
+  await prisma.discount.upsert({
+    where: { code: "WELCOME10" },
+    update: {
+      isActive: true,
+      type: "PERCENTAGE",
+      value: new Decimal(10),
+      minOrder: new Decimal(3000),
+      maxUses: 500
+    },
+    create: {
+      code: "WELCOME10",
+      type: "PERCENTAGE",
+      value: new Decimal(10),
+      minOrder: new Decimal(3000),
+      maxUses: 500,
+      isActive: true
+    }
+  });
+
   await prisma.blogPost.upsert({
     where: { slug: "discover-your-signature-scent" },
     update: {

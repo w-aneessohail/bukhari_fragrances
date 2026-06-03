@@ -2,9 +2,25 @@ import { randomUUID } from "node:crypto";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../config/database.js";
 import { HttpError } from "../utils/httpError.js";
+import {
+  calculateCartTotals,
+  validateDiscountForCart
+} from "../utils/cartTotals.utils.js";
 import { decimalToNumber } from "../utils/product.utils.js";
 
+const emptyCartResponse = {
+  id: null,
+  items: [],
+  subtotal: 0,
+  itemCount: 0,
+  discount: 0,
+  shipping: 0,
+  total: 0,
+  discountCode: null as string | null
+};
+
 const cartInclude = {
+  discount: true,
   items: {
     orderBy: { createdAt: "asc" as const },
     include: {
@@ -52,12 +68,17 @@ function mapCart(cart: CartWithItems) {
 
   const subtotal = Number(items.reduce((sum, item) => sum + item.lineTotal, 0).toFixed(2));
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totals = calculateCartTotals(subtotal, cart.discount);
 
   return {
     id: cart.id,
     items,
     subtotal,
-    itemCount
+    itemCount,
+    discount: totals.discountAmount,
+    shipping: totals.shipping,
+    total: totals.total,
+    discountCode: totals.discountCode
   };
 }
 
@@ -372,4 +393,52 @@ async function findCartForOwner(userId?: string, sessionId?: string, required = 
   }
 
   return cart;
+}
+
+export async function applyCartDiscount(code: string, userId?: string, sessionId?: string) {
+  const cart = await findCartForOwner(userId, sessionId);
+
+  if (!cart || cart.items.length === 0) {
+    throw new HttpError("Your cart is empty", 400);
+  }
+
+  const normalizedCode = code.trim().toUpperCase();
+  const discount = await prisma.discount.findUnique({
+    where: { code: normalizedCode }
+  });
+
+  if (!discount) {
+    throw new HttpError("Invalid discount code", 400);
+  }
+
+  const subtotal = cart.items.reduce(
+    (sum, item) => sum + Number(item.price) * item.quantity,
+    0
+  );
+
+  validateDiscountForCart(discount, subtotal);
+
+  await prisma.cart.update({
+    where: { id: cart.id },
+    data: { discountId: discount.id }
+  });
+
+  return getCart(userId, sessionId);
+}
+
+export async function removeCartDiscount(userId?: string, sessionId?: string) {
+  const cart = await findCartForOwner(userId, sessionId, false);
+
+  if (!cart) {
+    return getCart(userId, sessionId);
+  }
+
+  if (cart.discountId) {
+    await prisma.cart.update({
+      where: { id: cart.id },
+      data: { discountId: null }
+    });
+  }
+
+  return getCart(userId, sessionId);
 }

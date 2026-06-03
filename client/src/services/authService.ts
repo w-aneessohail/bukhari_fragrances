@@ -1,5 +1,7 @@
 import { api } from "./api";
 import { useAuthStore } from "../store/authStore";
+import { useCartStore } from "../store/cartStore";
+import { useWishlistStore } from "../store/wishlistStore";
 
 export async function bootstrapSession() {
   try {
@@ -24,5 +26,31 @@ export async function bootstrapSession() {
   } catch {
     useAuthStore.getState().logout();
     return false;
+  }
+}
+
+export async function logoutUser() {
+  try {
+    await api.post("/auth/logout");
+  } catch {
+    // Clear local session even if the server call fails.
+  }
+
+  useAuthStore.getState().logout();
+  useWishlistStore.getState().setFromList([]);
+
+  try {
+    await useCartStore.getState().fetchCart();
+  } catch {
+    useCartStore.getState().setCart({
+      id: null,
+      items: [],
+      subtotal: 0,
+      itemCount: 0,
+      discount: 0,
+      shipping: 0,
+      total: 0,
+      discountCode: null
+    });
   }
 }

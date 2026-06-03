@@ -13,3 +13,7 @@ export const updateCartItemSchema = z.object({
 export const cartItemParamsSchema = z.object({
   itemId: z.string().min(1)
 });
+
+export const applyDiscountSchema = z.object({
+  code: z.string().trim().min(1).max(50)
+});

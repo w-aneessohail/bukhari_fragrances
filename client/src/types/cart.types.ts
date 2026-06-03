@@ -24,4 +24,8 @@ export type Cart = {
   items: CartItem[];
   subtotal: number;
   itemCount: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  discountCode: string | null;
 };

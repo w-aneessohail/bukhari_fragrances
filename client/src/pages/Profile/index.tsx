@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import AddressManager from "../../components/profile/AddressManager";
 import ChangePasswordForm from "../../components/profile/ChangePasswordForm";
+import LogoutSection from "../../components/profile/LogoutSection";
 import { useAuthStore } from "../../store/authStore";
 
 const tabs = ["Personal Info", "Addresses", "Orders", "Security"] as const;
@@ -61,7 +62,17 @@ export default function ProfilePage() {
           </div>
         ) : null}
 
-        {activeTab === "Security" ? <ChangePasswordForm /> : null}
+        {activeTab === "Security" ? (
+          <div className="space-y-8">
+            <ChangePasswordForm />
+            <div className="border-t border-border pt-8">
+              <h2 className="font-heading text-xl text-text-primary">Session</h2>
+              <div className="mt-4">
+                <LogoutSection />
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </section>
   );

@@ -29,3 +29,13 @@ export async function clearCart() {
   const response = await api.delete<{ data: Cart }>("/cart");
   return response.data.data;
 }
+
+export async function applyDiscount(code: string) {
+  const response = await api.post<{ data: Cart }>("/cart/discount", { code });
+  return response.data.data;
+}
+
+export async function removeDiscount() {
+  const response = await api.delete<{ data: Cart }>("/cart/discount");
+  return response.data.data;
+}

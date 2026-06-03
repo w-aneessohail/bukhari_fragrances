@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ThemeMode } from "../../../enums/ThemeMode";
+import { logoutUser } from "../../../services/authService";
 import { useAuthStore } from "../../../store/authStore";
 import { useCartStore } from "../../../store/cartStore";
 import { useWishlistStore } from "../../../store/wishlistStore";
@@ -11,12 +12,18 @@ type NavbarProps = {
 };
 
 export default function Navbar({ isScrolled }: NavbarProps) {
+  const navigate = useNavigate();
   const { theme, setTheme } = useThemeStore();
   const itemCount = useCartStore((state) => state.cart.itemCount);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const wishlistCount = useWishlistStore((state) => state.items.length);
   const user = useAuthStore((state) => state.user);
   const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+
+  const handleLogout = async () => {
+    await logoutUser();
+    navigate("/");
+  };
 
   return (
     <header
@@ -68,6 +75,13 @@ export default function Navbar({ isScrolled }: NavbarProps) {
                 </span>
               ) : null}
             </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-sm text-text-secondary hover:text-accent-gold"
+            >
+              Sign out
+            </button>
             </>
           ) : (
             <Link to="/login" className="text-sm text-text-secondary hover:text-accent-gold">

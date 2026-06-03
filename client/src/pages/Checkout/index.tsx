@@ -237,6 +237,12 @@ export default function CheckoutPage() {
             <dt className="text-text-secondary">Shipping</dt>
             <dd>Rs. {summary.shipping.toLocaleString()}</dd>
           </div>
+          {summary.discount > 0 ? (
+            <div className="flex justify-between text-green-600">
+              <dt>Discount</dt>
+              <dd>- Rs. {summary.discount.toLocaleString()}</dd>
+            </div>
+          ) : null}
           <div className="flex justify-between text-base font-semibold text-accent-gold">
             <dt>Total</dt>
             <dd>Rs. {summary.total.toLocaleString()}</dd>

@@ -6,7 +6,11 @@ const emptyCart: Cart = {
   id: null,
   items: [],
   subtotal: 0,
-  itemCount: 0
+  itemCount: 0,
+  discount: 0,
+  shipping: 0,
+  total: 0,
+  discountCode: null
 };
 
 type CartState = {
@@ -18,6 +22,8 @@ type CartState = {
   updateItem: (itemId: string, quantity: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   clear: () => Promise<void>;
+  applyDiscount: (code: string) => Promise<void>;
+  removeDiscount: () => Promise<void>;
   setCart: (cart: Cart) => void;
 };
 
@@ -79,6 +85,29 @@ export const useCartStore = create<CartState>((set) => ({
       set({ cart });
     } catch {
       set({ error: "Could not clear cart" });
+    }
+  },
+
+  applyDiscount: async (code) => {
+    set({ error: null });
+    try {
+      const cart = await cartService.applyDiscount(code);
+      set({ cart });
+    } catch (error) {
+      const axiosMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      const message = axiosMessage ?? "Could not apply discount";
+      set({ error: message });
+      throw new Error(message);
+    }
+  },
+
+  removeDiscount: async () => {
+    set({ error: null });
+    try {
+      const cart = await cartService.removeDiscount();
+      set({ cart });
+    } catch {
+      set({ error: "Could not remove discount" });
     }
   }
 }));

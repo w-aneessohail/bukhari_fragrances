@@ -3,13 +3,16 @@ import { optionalAuth } from "../middleware/auth.middleware.js";
 import { validateBody, validateParams } from "../middleware/validate.middleware.js";
 import {
   addCartItemSchema,
+  applyDiscountSchema,
   cartItemParamsSchema,
   updateCartItemSchema
 } from "../validators/cart.validator.js";
 import {
   addCartItemController,
+  applyCartDiscountController,
   clearCartController,
   getCartController,
+  removeCartDiscountController,
   removeCartItemController,
   updateCartItemController
 } from "../controllers/cart.controller.js";
@@ -38,5 +41,7 @@ router.delete(
   asyncHandler(removeCartItemController)
 );
 router.delete("/", asyncHandler(clearCartController));
+router.post("/discount", validateBody(applyDiscountSchema), asyncHandler(applyCartDiscountController));
+router.delete("/discount", asyncHandler(removeCartDiscountController));
 
 export default router;

@@ -2,9 +2,11 @@ import type { Request, Response } from "express";
 import { ApiResponse } from "../utils/response.utils.js";
 import {
   addCartItem,
+  applyCartDiscount,
   clearCart,
   getCart,
   getOrCreateCartForRequest,
+  removeCartDiscount,
   removeCartItem,
   updateCartItemQuantity
 } from "../services/cart.service.js";
@@ -64,7 +66,7 @@ export async function getCartController(req: Request, res: Response) {
       new ApiResponse({
         success: true,
         message: "Cart retrieved",
-        data: { id: null, items: [], subtotal: 0, itemCount: 0 }
+        data: { id: null, items: [], subtotal: 0, itemCount: 0, discount: 0, shipping: 0, total: 0, discountCode: null }
       })
     );
   }
@@ -150,6 +152,34 @@ export async function clearCartController(req: Request, res: Response) {
     new ApiResponse({
       success: true,
       message: "Cart cleared",
+      data: cart
+    })
+  );
+}
+
+export async function applyCartDiscountController(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  const sessionId = readSessionId(req);
+  const cart = await applyCartDiscount(req.body.code, userId, sessionId);
+
+  res.json(
+    new ApiResponse({
+      success: true,
+      message: "Discount applied",
+      data: cart
+    })
+  );
+}
+
+export async function removeCartDiscountController(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  const sessionId = readSessionId(req);
+  const cart = await removeCartDiscount(userId, sessionId);
+
+  res.json(
+    new ApiResponse({
+      success: true,
+      message: "Discount removed",
       data: cart
     })
   );

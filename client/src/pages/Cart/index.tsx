@@ -5,9 +5,13 @@ import { useAuthStore } from "../../store/authStore";
 import { useCartStore } from "../../store/cartStore";
 
 export default function CartPage() {
-  const { cart, isLoading, error, updateItem, removeItem, clear } = useCartStore();
+  const { cart, isLoading, error, updateItem, removeItem, clear, applyDiscount, removeDiscount } =
+    useCartStore();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountError, setDiscountError] = useState<string | null>(null);
+  const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
 
   const handleUpdateQuantity = async (itemId: string, quantity: number) => {
     setUpdatingId(itemId);
@@ -16,6 +20,29 @@ export default function CartPage() {
     } finally {
       setUpdatingId(null);
     }
+  };
+
+  const handleApplyDiscount = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!discountCode.trim()) {
+      return;
+    }
+
+    setDiscountError(null);
+    setIsApplyingDiscount(true);
+    try {
+      await applyDiscount(discountCode.trim());
+      setDiscountCode("");
+    } catch (err) {
+      setDiscountError(err instanceof Error ? err.message : "Could not apply discount");
+    } finally {
+      setIsApplyingDiscount(false);
+    }
+  };
+
+  const handleRemoveDiscount = async () => {
+    setDiscountError(null);
+    await removeDiscount();
   };
 
   if (isLoading) {
@@ -81,17 +108,63 @@ export default function CartPage() {
 
           <aside className="h-fit rounded-xl border border-border bg-card p-6">
             <h2 className="font-heading text-xl text-text-primary">Order summary</h2>
+
+            <form onSubmit={handleApplyDiscount} className="mt-4 space-y-2">
+              <label className="block text-sm text-text-secondary" htmlFor="discount-code">
+                Discount code
+              </label>
+              <div className="flex gap-2">
+                <input
+                  id="discount-code"
+                  value={discountCode}
+                  onChange={(event) => setDiscountCode(event.target.value.toUpperCase())}
+                  placeholder="e.g. WELCOME10"
+                  className="min-w-0 flex-1 rounded-md border border-border bg-input px-3 py-2 text-sm uppercase"
+                />
+                <button
+                  type="submit"
+                  disabled={isApplyingDiscount || !discountCode.trim()}
+                  className="rounded-md border border-border px-3 py-2 text-sm hover:border-accent-gold hover:text-accent-gold disabled:opacity-50"
+                >
+                  Apply
+                </button>
+              </div>
+              {discountError ? <p className="text-xs text-red-500">{discountError}</p> : null}
+              {cart.discountCode ? (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-accent-gold">{cart.discountCode} applied</span>
+                  <button
+                    type="button"
+                    onClick={handleRemoveDiscount}
+                    className="text-text-secondary underline hover:text-accent-gold"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : null}
+            </form>
+
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-text-secondary">Subtotal</dt>
                 <dd className="font-medium">Rs. {cart.subtotal.toLocaleString()}</dd>
               </div>
+              {cart.discount > 0 ? (
+                <div className="flex justify-between text-green-600">
+                  <dt>Discount</dt>
+                  <dd>- Rs. {cart.discount.toLocaleString()}</dd>
+                </div>
+              ) : null}
               <div className="flex justify-between">
                 <dt className="text-text-secondary">Shipping</dt>
-                <dd className="text-text-secondary">Calculated at checkout</dd>
+                <dd className="font-medium">
+                  {cart.shipping === 0 ? "Free" : `Rs. ${cart.shipping.toLocaleString()}`}
+                </dd>
               </div>
             </dl>
-            <p className="mt-6 text-2xl font-semibold text-accent-gold">Rs. {cart.subtotal.toLocaleString()}</p>
+            <p className="mt-6 text-2xl font-semibold text-accent-gold">
+              Rs. {cart.total.toLocaleString()}
+            </p>
             <Link
               to={isAuthenticated ? "/checkout" : "/login"}
               className="mt-6 block w-full rounded-lg bg-accent-gold px-6 py-3 text-center font-medium text-bg-primary"

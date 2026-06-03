@@ -1,13 +1,12 @@
 import { PaymentGateway, PaymentStatus, Prisma } from "@prisma/client";
 import { prisma } from "../config/database.js";
 import { stripe } from "../config/stripe.js";
+import { calculateCartTotals, validateDiscountForCart } from "../utils/cartTotals.utils.js";
 import { HttpError } from "../utils/httpError.js";
 import { decimalToNumber } from "../utils/product.utils.js";
 
-const FREE_SHIPPING_MIN = 10_000;
-const SHIPPING_FLAT = 500;
-
 const cartInclude = {
+  discount: true,
   items: {
     orderBy: { createdAt: "asc" as const },
     include: {
@@ -117,14 +116,28 @@ export async function getCheckoutSummary(userId: string) {
     (sum, item) => sum + Number(item.price) * item.quantity,
     0
   );
-  const shipping = subtotal >= FREE_SHIPPING_MIN ? 0 : SHIPPING_FLAT;
-  const total = subtotal + shipping;
+
+  let activeDiscount = cart.discount;
+  if (activeDiscount) {
+    try {
+      validateDiscountForCart(activeDiscount, subtotal);
+    } catch {
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: { discountId: null }
+      });
+      activeDiscount = null;
+    }
+  }
+
+  const { discountAmount, shipping, total } = calculateCartTotals(subtotal, activeDiscount);
 
   return {
     subtotal: Number(subtotal.toFixed(2)),
     shipping,
-    discount: 0,
-    total: Number(total.toFixed(2)),
+    discount: discountAmount,
+    total,
+    discountCode: activeDiscount?.code ?? null,
     itemCount: cart.items.reduce((sum, item) => sum + item.quantity, 0)
   };
 }
@@ -157,8 +170,21 @@ export async function createOrderFromCart(userId: string, input: CreateOrderInpu
     (sum, item) => sum + Number(item.price) * item.quantity,
     0
   );
-  const shipping = subtotal >= FREE_SHIPPING_MIN ? 0 : SHIPPING_FLAT;
-  const total = subtotal + shipping;
+
+  let activeDiscount = cart.discount;
+  if (activeDiscount) {
+    try {
+      validateDiscountForCart(activeDiscount, subtotal);
+    } catch (error) {
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: { discountId: null }
+      });
+      throw error;
+    }
+  }
+
+  const { discountAmount, shipping, total } = calculateCartTotals(subtotal, activeDiscount);
   const orderNumber = generateOrderNumber();
   const paymentGateway: PaymentGateway = input.paymentMethod;
   const shippingNotes = formatShippingNotes(input);
@@ -189,7 +215,7 @@ export async function createOrderFromCart(userId: string, input: CreateOrderInpu
         orderNumber,
         status: input.paymentMethod === "COD" ? "CONFIRMED" : "PENDING",
         subtotal: new Prisma.Decimal(subtotal),
-        discount: new Prisma.Decimal(0),
+        discount: new Prisma.Decimal(discountAmount),
         shipping: new Prisma.Decimal(shipping),
         total: new Prisma.Decimal(total),
         paymentMethod: paymentGateway,
@@ -239,6 +265,18 @@ export async function createOrderFromCart(userId: string, input: CreateOrderInpu
     }
 
     await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+
+    if (cart.discountId) {
+      await tx.cart.update({
+        where: { id: cart.id },
+        data: { discountId: null }
+      });
+
+      await tx.discount.update({
+        where: { id: cart.discountId },
+        data: { usedCount: { increment: 1 } }
+      });
+    }
 
     return createdOrder;
   });
