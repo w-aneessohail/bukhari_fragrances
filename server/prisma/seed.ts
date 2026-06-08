@@ -4,6 +4,19 @@ import { Decimal } from "@prisma/client/runtime/library";
 
 const prisma = new PrismaClient();
 
+const perfumeImages = [
+  "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&h=1100&q=80",
+  "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=900&h=1100&q=80",
+  "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=900&h=1100&q=80",
+  "https://images.unsplash.com/photo-1615634260167-c8cdede054de?auto=format&fit=crop&w=900&h=1100&q=80",
+  "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=900&h=1100&q=80",
+  "https://images.unsplash.com/photo-1591375372226-3531cf2bdf4f?auto=format&fit=crop&w=900&h=1100&q=80"
+] as const;
+
+function productImage(index: number, altIndex = 0) {
+  return perfumeImages[(index + altIndex) % perfumeImages.length];
+}
+
 const productSeeds = [
   {
     name: "Bukhari Oud Royale",
@@ -19,10 +32,7 @@ const productSeeds = [
     scentFamily: "WOODY",
     isFeatured: true,
     tags: ["oud", "royal", "night"],
-    images: [
-      "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(0), productImage(1)],
     notes: [
       { noteType: "TOP", ingredientName: "Saffron", intensity: 7 },
       { noteType: "HEART", ingredientName: "Rose", intensity: 8 },
@@ -47,10 +57,7 @@ const productSeeds = [
     scentFamily: "ORIENTAL",
     isFeatured: true,
     tags: ["amber", "warm", "lahore"],
-    images: [
-      "https://images.unsplash.com/photo-1615634260167-c8cdede054de?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(1), productImage(2)],
     notes: [
       { noteType: "TOP", ingredientName: "Bergamot", intensity: 6 },
       { noteType: "HEART", ingredientName: "Amber", intensity: 9 },
@@ -75,9 +82,7 @@ const productSeeds = [
     scentFamily: "FLORAL",
     isFeatured: false,
     tags: ["jasmine", "floral", "elegant"],
-    images: [
-      "https://images.unsplash.com/photo-1563170351-be82bc888aa4?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(2)],
     notes: [
       { noteType: "TOP", ingredientName: "Pear", intensity: 5 },
       { noteType: "HEART", ingredientName: "Jasmine", intensity: 10 },
@@ -102,9 +107,7 @@ const productSeeds = [
     scentFamily: "CITRUS",
     isFeatured: false,
     tags: ["fresh", "citrus", "daytime"],
-    images: [
-      "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(3)],
     notes: [
       { noteType: "TOP", ingredientName: "Grapefruit", intensity: 8 },
       { noteType: "HEART", ingredientName: "Neroli", intensity: 6 },
@@ -129,9 +132,7 @@ const productSeeds = [
     scentFamily: "ORIENTAL",
     isFeatured: true,
     tags: ["saffron", "luxury", "spiced"],
-    images: [
-      "https://images.unsplash.com/photo-1588405748880-12d1d2a59c75?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(4)],
     notes: [
       { noteType: "TOP", ingredientName: "Saffron", intensity: 9 },
       { noteType: "HEART", ingredientName: "Damask Rose", intensity: 7 },
@@ -156,9 +157,7 @@ const productSeeds = [
     scentFamily: "FRESH",
     isFeatured: false,
     tags: ["musk", "clean", "daily"],
-    images: [
-      "https://images.unsplash.com/photo-1591375372226-3531cf2bdf4f?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(5)],
     notes: [
       { noteType: "TOP", ingredientName: "Aldehydes", intensity: 6 },
       { noteType: "HEART", ingredientName: "White Flowers", intensity: 6 },
@@ -183,9 +182,7 @@ const productSeeds = [
     scentFamily: "WOODY",
     isFeatured: false,
     tags: ["cedar", "masculine", "classic"],
-    images: [
-      "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(0, 2)],
     notes: [
       { noteType: "TOP", ingredientName: "Pink Pepper", intensity: 5 },
       { noteType: "HEART", ingredientName: "Cedarwood", intensity: 9 },
@@ -210,9 +207,7 @@ const productSeeds = [
     scentFamily: "CHYPRE",
     isFeatured: false,
     tags: ["attar", "rose", "traditional"],
-    images: [
-      "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(1, 1)],
     notes: [
       { noteType: "TOP", ingredientName: "Geranium", intensity: 6 },
       { noteType: "HEART", ingredientName: "Turkish Rose", intensity: 8 },
@@ -237,9 +232,7 @@ const productSeeds = [
     scentFamily: "AQUATIC",
     isFeatured: false,
     tags: ["aquatic", "summer", "fresh"],
-    images: [
-      "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(2, 1)],
     notes: [
       { noteType: "TOP", ingredientName: "Lemon Peel", intensity: 7 },
       { noteType: "HEART", ingredientName: "Sea Notes", intensity: 8 },
@@ -264,9 +257,7 @@ const productSeeds = [
     scentFamily: "GOURMAND",
     isFeatured: true,
     tags: ["gourmand", "vanilla", "coffee"],
-    images: [
-      "https://images.unsplash.com/photo-1607680594563-2fdb8cc8c6d7?auto=format&fit=crop&w=1200&q=80"
-    ],
+    images: [productImage(3, 2)],
     notes: [
       { noteType: "TOP", ingredientName: "Cinnamon", intensity: 6 },
       { noteType: "HEART", ingredientName: "Coffee", intensity: 8 },
@@ -290,7 +281,9 @@ async function main() {
       role: "ADMIN",
       passwordHash: adminPasswordHash,
       isVerified: true,
-      loyaltyPoints: 1500
+      loyaltyPoints: 1500,
+      avatar:
+        "https://ui-avatars.com/api/?name=Bukhari+Admin&background=C9A227&color=1a1a1a&size=128"
     },
     create: {
       email: "admin@bukhariperfumes.local",
@@ -299,7 +292,9 @@ async function main() {
       passwordHash: adminPasswordHash,
       phone: "+923001112233",
       isVerified: true,
-      loyaltyPoints: 1500
+      loyaltyPoints: 1500,
+      avatar:
+        "https://ui-avatars.com/api/?name=Bukhari+Admin&background=C9A227&color=1a1a1a&size=128"
     }
   });
 
@@ -310,7 +305,9 @@ async function main() {
       role: "CUSTOMER",
       passwordHash: customerPasswordHash,
       isVerified: true,
-      loyaltyPoints: 320
+      loyaltyPoints: 320,
+      avatar:
+        "https://ui-avatars.com/api/?name=Bukhari+Customer&background=3d2c29&color=f5f0eb&size=128"
     },
     create: {
       email: "customer@bukhariperfumes.local",
@@ -319,7 +316,9 @@ async function main() {
       passwordHash: customerPasswordHash,
       phone: "+923009998877",
       isVerified: true,
-      loyaltyPoints: 320
+      loyaltyPoints: 320,
+      avatar:
+        "https://ui-avatars.com/api/?name=Bukhari+Customer&background=3d2c29&color=f5f0eb&size=128"
     }
   });
 
@@ -527,7 +526,8 @@ async function main() {
     where: { slug: "discover-your-signature-scent" },
     update: {
       title: "Discover Your Signature Scent with Bukhari Perfumes",
-      excerpt: "A practical guide to choosing the perfect fragrance profile for Lahore weather and lifestyle."
+      excerpt: "A practical guide to choosing the perfect fragrance profile for Lahore weather and lifestyle.",
+      image: perfumeImages[0]
     },
     create: {
       title: "Discover Your Signature Scent with Bukhari Perfumes",
@@ -535,13 +535,228 @@ async function main() {
       content:
         "Choosing a signature fragrance starts with understanding your scent family preference and concentration tolerance.",
       excerpt: "A practical guide to choosing the perfect fragrance profile for Lahore weather and lifestyle.",
-      image:
-        "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1200&q=80",
+      image: perfumeImages[0],
       authorId: adminUser.id,
       publishedAt: new Date(),
       tags: ["guide", "fragrance", "bukhari-perfumes"]
     }
   });
+
+  const blogPosts = [
+    {
+      slug: "oud-care-guide",
+      title: "How to Layer Oud for Long-Lasting Wear",
+      excerpt: "Simple layering tips for attars and parfums in warm climates.",
+      image: perfumeImages[1],
+      content: "Start with a light citrus base, add your oud heart, and finish with a musk veil."
+    },
+    {
+      slug: "wedding-season-fragrances",
+      title: "Wedding Season Fragrance Picks from Bukhari",
+      excerpt: "Elegant profiles for baraat nights, mehndi, and walima receptions.",
+      image: perfumeImages[2],
+      content: "Rose-forward attars and ambered parfums perform beautifully for formal events."
+    },
+    {
+      slug: "gift-sets-that-impress",
+      title: "Gift Sets That Impress Every Recipient",
+      excerpt: "Curated combinations for Eid, birthdays, and corporate gifting.",
+      image: perfumeImages[3],
+      content: "Pair a signature EDP with a travel attar for a memorable two-piece gift."
+    }
+  ];
+
+  for (const post of blogPosts) {
+    await prisma.blogPost.upsert({
+      where: { slug: post.slug },
+      update: {
+        title: post.title,
+        excerpt: post.excerpt,
+        image: post.image,
+        content: post.content,
+        publishedAt: new Date()
+      },
+      create: {
+        title: post.title,
+        slug: post.slug,
+        excerpt: post.excerpt,
+        image: post.image,
+        content: post.content,
+        authorId: adminUser.id,
+        publishedAt: new Date(),
+        tags: ["bukhari-perfumes", "guide"]
+      }
+    });
+  }
+
+  const wishlistSlugs = ["bukhari-oud-royale", "velvet-saffron", "gourmand-majlis", "lahore-midnight-amber"];
+  for (const slug of wishlistSlugs) {
+    const product = await prisma.product.findUnique({ where: { slug } });
+    if (!product) continue;
+    await prisma.wishlist.upsert({
+      where: { userId_productId: { userId: customerUser.id, productId: product.id } },
+      update: {},
+      create: { userId: customerUser.id, productId: product.id }
+    });
+  }
+
+  const cartProductSlugs = [
+    { slug: "citrus-minar", quantity: 1 },
+    { slug: "noor-al-musk", quantity: 2 }
+  ];
+  const customerCart = await prisma.cart.upsert({
+    where: { userId: customerUser.id },
+    update: {},
+    create: { userId: customerUser.id }
+  });
+  await prisma.cartItem.deleteMany({ where: { cartId: customerCart.id } });
+  for (const item of cartProductSlugs) {
+    const product = await prisma.product.findUnique({
+      where: { slug: item.slug },
+      include: { sizes: { take: 1, orderBy: { sizeMl: "asc" } } }
+    });
+    if (!product) continue;
+    const size = product.sizes[0];
+    const unitPrice = size?.price ?? product.salePrice ?? product.price;
+    await prisma.cartItem.create({
+      data: {
+        cartId: customerCart.id,
+        productId: product.id,
+        sizeId: size?.id ?? null,
+        quantity: item.quantity,
+        price: unitPrice
+      }
+    });
+  }
+
+  const orderSeeds = [
+    {
+      orderNumber: "BK-2026-0001",
+      status: "DELIVERED" as const,
+      paymentStatus: "PAID" as const,
+      items: [
+        { slug: "bukhari-oud-royale", quantity: 1, sizeLabel: "50ml" },
+        { slug: "rosewood-attar", quantity: 1, sizeLabel: "12ml" }
+      ],
+      subtotal: 12600,
+      discount: 1260,
+      shipping: 250,
+      total: 11590
+    },
+    {
+      orderNumber: "BK-2026-0002",
+      status: "SHIPPED" as const,
+      paymentStatus: "PAID" as const,
+      items: [{ slug: "jasmine-dusk", quantity: 1, sizeLabel: "50ml" }],
+      subtotal: 5900,
+      discount: 0,
+      shipping: 250,
+      total: 6150
+    },
+    {
+      orderNumber: "BK-2026-0003",
+      status: "PROCESSING" as const,
+      paymentStatus: "PENDING" as const,
+      items: [{ slug: "gourmand-majlis", quantity: 1, sizeLabel: "100ml" }],
+      subtotal: 11500,
+      discount: 0,
+      shipping: 300,
+      total: 11800
+    }
+  ];
+
+  for (const orderSeed of orderSeeds) {
+    const order = await prisma.order.upsert({
+      where: { orderNumber: orderSeed.orderNumber },
+      update: {
+        status: orderSeed.status,
+        paymentStatus: orderSeed.paymentStatus,
+        subtotal: new Decimal(orderSeed.subtotal),
+        discount: new Decimal(orderSeed.discount),
+        shipping: new Decimal(orderSeed.shipping),
+        total: new Decimal(orderSeed.total)
+      },
+      create: {
+        userId: customerUser.id,
+        orderNumber: orderSeed.orderNumber,
+        status: orderSeed.status,
+        subtotal: new Decimal(orderSeed.subtotal),
+        discount: new Decimal(orderSeed.discount),
+        shipping: new Decimal(orderSeed.shipping),
+        total: new Decimal(orderSeed.total),
+        paymentMethod: "COD",
+        paymentStatus: orderSeed.paymentStatus
+      }
+    });
+
+    await prisma.orderItem.deleteMany({ where: { orderId: order.id } });
+    for (const line of orderSeed.items) {
+      const product = await prisma.product.findUnique({
+        where: { slug: line.slug },
+        include: { images: { where: { isMain: true }, take: 1 } }
+      });
+      if (!product) continue;
+      const unitPrice = product.salePrice ?? product.price;
+      await prisma.orderItem.create({
+        data: {
+          orderId: order.id,
+          productId: product.id,
+          name: product.name,
+          price: unitPrice,
+          quantity: line.quantity,
+          sizeLabel: line.sizeLabel,
+          image: product.images[0]?.url ?? perfumeImages[0]
+        }
+      });
+    }
+  }
+
+  const diaryEntries = [
+    {
+      slug: "bukhari-oud-royale",
+      rating: 5,
+      mood: "Confident",
+      occasion: "Evening dinner",
+      notes: "Rich oud with excellent projection in cooler weather.",
+      daysAgo: 2
+    },
+    {
+      slug: "citrus-minar",
+      rating: 4,
+      mood: "Fresh",
+      occasion: "Office",
+      notes: "Bright and clean — perfect for daytime meetings.",
+      daysAgo: 5
+    },
+    {
+      slug: "lahore-midnight-amber",
+      rating: 5,
+      mood: "Warm",
+      occasion: "Family gathering",
+      notes: "Comforting amber trail that lasts through the night.",
+      daysAgo: 9
+    }
+  ];
+
+  await prisma.scentDiary.deleteMany({ where: { userId: customerUser.id } });
+
+  for (const entry of diaryEntries) {
+    const product = await prisma.product.findUnique({ where: { slug: entry.slug } });
+    if (!product) continue;
+    const wornDate = new Date();
+    wornDate.setDate(wornDate.getDate() - entry.daysAgo);
+    await prisma.scentDiary.create({
+      data: {
+        userId: customerUser.id,
+        productId: product.id,
+        rating: entry.rating,
+        mood: entry.mood,
+        occasion: entry.occasion,
+        notes: entry.notes,
+        dateWorn: wornDate
+      }
+    });
+  }
 
   console.log("Seed complete: Bukhari Perfumes sample data inserted.");
 }
