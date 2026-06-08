@@ -5,6 +5,7 @@ type AuthUser = {
   name: string;
   email: string;
   role: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN";
+  avatar?: string | null;
 };
 
 type AuthState = {

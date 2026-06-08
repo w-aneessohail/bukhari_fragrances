@@ -86,6 +86,13 @@ export default function LoginModal() {
           Forgot password?
         </Link>
       </div>
+
+      <p className="mt-8 text-center text-xs text-text-secondary">
+        Staff member?{" "}
+        <Link to="/admin/login" className="text-accent-gold hover:underline">
+          Admin sign in
+        </Link>
+      </p>
     </motion.div>
   );
 }

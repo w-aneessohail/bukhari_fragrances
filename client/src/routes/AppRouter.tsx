@@ -26,6 +26,7 @@ const ProfilePage = lazy(() => import("../pages/Profile"));
 const WishlistPage = lazy(() => import("../pages/Wishlist"));
 const ScentDiaryPage = lazy(() => import("../pages/ScentDiary"));
 const GiftBuilderPage = lazy(() => import("../pages/GiftBuilder"));
+const AdminLoginPage = lazy(() => import("../pages/admin/Login"));
 const AdminDashboardPage = lazy(() => import("../pages/admin/Dashboard"));
 const AdminProductsPage = lazy(() => import("../pages/admin/Products"));
 const AdminOrdersPage = lazy(() => import("../pages/admin/Orders"));
@@ -82,6 +83,8 @@ export default function AppRouter() {
               <Route path="checkout" element={<CheckoutPage />} />
             </Route>
           </Route>
+
+          <Route path="admin/login" element={<AdminLoginPage />} />
 
           <Route element={<AdminRoute />}>
             <Route path="admin" element={<AdminLayout />}>

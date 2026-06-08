@@ -5,7 +5,7 @@ export default function AdminRoute() {
   const { isAuthenticated, user } = useAuthStore();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   if (user?.role !== "ADMIN" && user?.role !== "SUPER_ADMIN") {

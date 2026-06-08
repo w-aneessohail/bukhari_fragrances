@@ -25,17 +25,3 @@
   --navbar-bg: rgba(13, 13, 13, 0.88);
   --input-bg: #1e1e30;
 }
-
-:root[data-theme="amber"] {
-  --bg-primary: #1c1208;
-  --bg-secondary: #2c1c0c;
-  --text-primary: #f5e6cc;
-  --text-secondary: #c9a96e;
-  --accent-gold: #ffd700;
-  --accent-warm: #e8834a;
-  --border-color: #3d2b12;
-  --card-bg: #231608;
-  --shadow: 0 4px 32px rgba(212, 175, 55, 0.12);
-  --navbar-bg: rgba(28, 18, 8, 0.9);
-  --input-bg: #231608;
-}
