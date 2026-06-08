@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { checkDatabaseHealth } from "../config/database.js";
 import { ApiResponse } from "../utils/response.utils.js";
 import authRoutes from "./auth.routes.js";
 import productRoutes from "./product.routes.js";
@@ -32,13 +33,31 @@ router.use("/reviews", reviewRoutes);
 router.use("/scent-diary", scentDiaryRoutes);
 router.use("/payments", paymentRoutes);
 
-router.get("/health", (_req, res) => {
-  res.json(
+router.get("/health", async (_req, res) => {
+  const databaseConnected = await checkDatabaseHealth();
+
+  if (!databaseConnected) {
+    return res.status(503).json(
+      new ApiResponse({
+        success: false,
+        message: "Database is not available",
+        data: {
+          status: "degraded",
+          database: "disconnected",
+          service: "bukhari-perfumes-server",
+          timestamp: new Date().toISOString()
+        }
+      })
+    );
+  }
+
+  return res.json(
     new ApiResponse({
       success: true,
       message: "Bukhari Perfumes API is healthy",
       data: {
         status: "ok",
+        database: "connected",
         service: "bukhari-perfumes-server",
         timestamp: new Date().toISOString()
       }
