@@ -7,29 +7,25 @@ import { Vector2 } from "three";
 import { useScrollExperience } from "../../context/ScrollExperienceContext";
 import EnvironmentSetup from "./EnvironmentSetup";
 import CameraRig from "./CameraRig";
-import PerfumeBottle from "./PerfumeBottle";
-import FloralCluster from "./FloralCluster";
+import ScrollHeroBottle from "./ScrollHeroBottle";
+import FloralFocus from "./FloralFocus";
 import SmokeParticles from "./SmokeParticles";
 import GoldDust from "./GoldDust";
 import RosePetals from "./RosePetals";
-import BottleCollection from "./BottleCollection";
-import { isInSection } from "../../constants/scrollSections";
+import ScentStream from "./ScentStream";
 
 function SceneContent() {
-  const { progress, isMobile, lowPerformance } = useScrollExperience();
-  const showHeroBottle = !isInSection(progress, "COLLECTION") && progress < 0.68;
-
   return (
-    <>
+    <group>
       <CameraRig />
       <EnvironmentSetup />
       <GoldDust />
-      {showHeroBottle ? <PerfumeBottle /> : null}
-      <FloralCluster />
+      <ScrollHeroBottle />
+      <FloralFocus />
+      <ScentStream />
       <SmokeParticles />
       <RosePetals />
-      <BottleCollection />
-    </>
+    </group>
   );
 }
 
@@ -38,16 +34,17 @@ type SceneProps = {
 };
 
 export default function Scene({ onPerformanceChange }: SceneProps) {
-  const { isMobile } = useScrollExperience();
+  const { isMobile, progress } = useScrollExperience();
   const [dpr, setDpr] = useState(1.5);
+  const canvasOpacity = progress > 0.78 ? 1 - (progress - 0.78) / 0.12 : 1;
 
   return (
-    <div className="absolute inset-0 z-0">
+    <div className="absolute inset-0 z-0 transition-opacity duration-700" style={{ opacity: canvasOpacity }}>
       <Canvas
         shadows
         dpr={dpr}
-        camera={{ fov: 45, near: 0.1, far: 100, position: [0, -0.5, 4] }}
-        gl={{ antialias: true, alpha: false }}
+        camera={{ fov: 36, near: 0.1, far: 100, position: [-1.15, 0.35, 5.5] }}
+        gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
         style={{ position: "absolute", inset: 0 }}
       >
         <PerformanceMonitor
@@ -64,11 +61,11 @@ export default function Scene({ onPerformanceChange }: SceneProps) {
           <SceneContent />
         </Suspense>
         <EffectComposer>
-          <Bloom luminanceThreshold={0.8} intensity={0.4} mipmapBlur />
-          <Vignette darkness={0.6} />
+          <Bloom luminanceThreshold={0.55} intensity={0.65} mipmapBlur radius={0.7} />
+          <Vignette darkness={0.65} offset={0.3} />
           <ChromaticAberration
             blendFunction={BlendFunction.NORMAL}
-            offset={isMobile ? new Vector2(0, 0) : new Vector2(0.0005, 0.0005)}
+            offset={isMobile ? new Vector2(0, 0) : new Vector2(0.0006, 0.0006)}
             radialModulation={false}
             modulationOffset={0}
           />

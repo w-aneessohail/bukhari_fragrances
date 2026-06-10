@@ -8,38 +8,56 @@ export type CameraKeyframe = {
 export const CAMERA_KEYFRAMES: CameraKeyframe[] = [
   {
     progress: 0,
-    position: { x: 0, y: -0.5, z: 4 },
-    target: { x: 0, y: 0.5, z: 0 },
-    fov: 45
+    position: { x: -1.15, y: 0.35, z: 5.5 },
+    target: { x: 2.1, y: 0.45, z: 0 },
+    fov: 36
+  },
+  {
+    progress: 0.11,
+    position: { x: -1.05, y: 0.3, z: 5.2 },
+    target: { x: 2.0, y: 0.4, z: 0 },
+    fov: 38
   },
   {
     progress: 0.22,
-    position: { x: -3, y: 2, z: 6 },
+    position: { x: 0.6, y: 0.25, z: 5 },
+    target: { x: -0.5, y: 0.05, z: 0 },
+    fov: 40
+  },
+  {
+    progress: 0.3,
+    position: { x: 0.9, y: 0.3, z: 5.3 },
+    target: { x: -0.7, y: -0.05, z: 0 },
+    fov: 42
+  },
+  {
+    progress: 0.36,
+    position: { x: 0.2, y: 0.35, z: 5.5 },
+    target: { x: 0, y: 0.08, z: 0 },
+    fov: 43
+  },
+  {
+    progress: 0.44,
+    position: { x: 0, y: 0.4, z: 5.6 },
+    target: { x: 0, y: 0.1, z: 0 },
+    fov: 44
+  },
+  {
+    progress: 0.54,
+    position: { x: -0.2, y: 0.45, z: 5.8 },
+    target: { x: 0, y: 0.12, z: 0 },
+    fov: 46
+  },
+  {
+    progress: 0.68,
+    position: { x: 0, y: 0.5, z: 6 },
+    target: { x: 0, y: 0.1, z: 0 },
+    fov: 48
+  },
+  {
+    progress: 0.78,
+    position: { x: 0, y: 0.35, z: 5.5 },
     target: { x: 0, y: 0, z: 0 },
-    fov: 55
-  },
-  {
-    progress: 0.4,
-    position: { x: 3, y: 0.5, z: 5 },
-    target: { x: 0, y: 0.5, z: 0 },
-    fov: 50
-  },
-  {
-    progress: 0.6,
-    position: { x: 0, y: 3, z: 9 },
-    target: { x: 0, y: 0, z: 0 },
-    fov: 65
-  },
-  {
-    progress: 0.77,
-    position: { x: 0, y: 1, z: 2.5 },
-    target: { x: 0, y: 1.2, z: 0 },
-    fov: 35
-  },
-  {
-    progress: 0.92,
-    position: { x: 0, y: 0.5, z: 5 },
-    target: { x: 0, y: 0.5, z: 0 },
-    fov: 45
+    fov: 44
   }
 ];

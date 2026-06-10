@@ -6,7 +6,7 @@ import { useScrollExperience } from "../../context/ScrollExperienceContext";
 import { isInSection } from "../../constants/scrollSections";
 import { EXPERIENCE_TEXTURES } from "../../constants/experienceAssets";
 
-const COUNT = 60;
+const COUNT = 45;
 
 function PetalMesh({ alphaMap }: { alphaMap: THREE.Texture | null }) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -15,10 +15,10 @@ function PetalMesh({ alphaMap }: { alphaMap: THREE.Texture | null }) {
   const material = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#8B2252",
+        color: "#c06080",
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.88,
         roughness: 0.65,
         alphaMap: alphaMap ?? undefined,
         alphaTest: alphaMap ? 0.15 : 0,
@@ -28,35 +28,27 @@ function PetalMesh({ alphaMap }: { alphaMap: THREE.Texture | null }) {
   );
 
   const reset = (mesh: THREE.Mesh) => {
-    mesh.position.x = (Math.random() - 0.5) * 10;
-    mesh.position.y = 8 + Math.random() * 4;
-    mesh.position.z = (Math.random() - 0.5) * 6;
+    mesh.position.x = (Math.random() - 0.5) * 8;
+    mesh.position.y = 6 + Math.random() * 3;
+    mesh.position.z = (Math.random() - 0.5) * 4;
     mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
   };
 
   useFrame((state, delta) => {
     const mesh = meshRef.current;
     if (!mesh) return;
-
-    mesh.position.y -= delta * (0.3 + (seed % 0.2));
-    mesh.position.x += Math.sin(state.clock.elapsedTime + seed) * delta * 0.1;
-    mesh.rotation.x += delta * 0.5;
-    mesh.rotation.z += delta * 0.3;
-
-    if (mesh.position.y < -2) {
-      reset(mesh);
-    }
+    mesh.position.y -= delta * (0.25 + (seed % 0.2));
+    mesh.position.x += Math.sin(state.clock.elapsedTime + seed) * delta * 0.12;
+    mesh.rotation.x += delta * 0.45;
+    mesh.rotation.z += delta * 0.28;
+    if (mesh.position.y < -2) reset(mesh);
   });
 
   return (
     <mesh ref={meshRef} material={material} castShadow>
-      <planeGeometry args={[0.18, 0.24]} />
+      <planeGeometry args={[0.16, 0.22]} />
     </mesh>
   );
-}
-
-function Petal({ alphaMap }: { alphaMap: THREE.Texture | null }) {
-  return <PetalMesh alphaMap={alphaMap} />;
 }
 
 function PetalsWithTexture() {
@@ -65,16 +57,13 @@ function PetalsWithTexture() {
   return (
     <group>
       {Array.from({ length: COUNT }, (_, i) => (
-        <Petal key={i} alphaMap={alphaMap} />
+        <PetalMesh key={i} alphaMap={alphaMap} />
       ))}
     </group>
   );
 }
 
-class PetalErrorBoundary extends Component<
-  { children: ReactNode },
-  { hasError: boolean }
-> {
+class PetalErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
 
   static getDerivedStateFromError() {
@@ -86,7 +75,7 @@ class PetalErrorBoundary extends Component<
       return (
         <group>
           {Array.from({ length: COUNT }, (_, i) => (
-            <Petal key={i} alphaMap={null} />
+            <PetalMesh key={i} alphaMap={null} />
           ))}
         </group>
       );
@@ -97,8 +86,9 @@ class PetalErrorBoundary extends Component<
 
 export default function RosePetals() {
   const { progress } = useScrollExperience();
+  const active = isInSection(progress, "POPULAR") || isInSection(progress, "NOTES");
 
-  if (!isInSection(progress, "COLLECTION")) return null;
+  if (!active) return null;
 
   return (
     <PetalErrorBoundary>
@@ -106,7 +96,7 @@ export default function RosePetals() {
         fallback={
           <group>
             {Array.from({ length: COUNT }, (_, i) => (
-              <Petal key={i} alphaMap={null} />
+              <PetalMesh key={i} alphaMap={null} />
             ))}
           </group>
         }

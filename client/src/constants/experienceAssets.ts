@@ -1,6 +1,7 @@
 export const EXPERIENCE_MODELS = {
   heroBottle: "/models/perfume_bottle_elegant_glass.glb",
   purpleBottle: "/models/purple_perfume_bottle.glb",
+  pinkFlower: "/models/pink_rose.glb",
   rose: "/models/papa_meilland_rose.glb",
   rosePetal: "/models/rose_petal.glb",
   roseInRain: "/models/rose_in_the_rain.glb"
@@ -18,20 +19,16 @@ export const EXPERIENCE_TEXTURES = {
   silkGold: "/others/silk_fabric_golden.png"
 } as const;
 
-/** Models skipped for web performance (very large file size). */
 export const SKIPPED_MODELS = [
   "/models/blue_flowers.glb",
   "/models/day_231_houseleek_-_1scanaday.glb",
   "/models/white_flowers_1.glb",
-  "/models/pink_rose.glb",
   "/models/perfume_bottle_elegant_glass (1).glb",
   "/models/rose_in_the_rain (1).glb"
 ] as const;
 
 export const PRELOAD_MODELS = [
   EXPERIENCE_MODELS.heroBottle,
-  EXPERIENCE_MODELS.purpleBottle,
-  EXPERIENCE_MODELS.rose,
-  EXPERIENCE_MODELS.rosePetal,
-  EXPERIENCE_MODELS.roseInRain
+  EXPERIENCE_MODELS.pinkFlower,
+  EXPERIENCE_MODELS.rosePetal
 ];

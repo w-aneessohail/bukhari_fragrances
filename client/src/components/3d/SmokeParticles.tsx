@@ -5,12 +5,13 @@ import * as THREE from "three";
 import { useScrollExperience } from "../../context/ScrollExperienceContext";
 import { isInSection, sectionProgress } from "../../constants/scrollSections";
 import { EXPERIENCE_TEXTURES } from "../../constants/experienceAssets";
+import { getFloralState } from "../../utils/scrollChoreography";
 import smokeVert from "../../shaders/smoke.vert.glsl?raw";
 import smokeFrag from "../../shaders/smoke.frag.glsl?raw";
 
-const COUNT = 800;
+const COUNT = 700;
 
-function MistPoints({ mistMap }: { mistMap: THREE.Texture | null }) {
+function MistPoints({ mistMap, origin }: { mistMap: THREE.Texture | null; origin: [number, number, number] }) {
   const pointsRef = useRef<THREE.Points>(null);
   const { progress, isMobile } = useScrollExperience();
   const count = isMobile ? COUNT / 2 : COUNT;
@@ -23,11 +24,11 @@ function MistPoints({ mistMap }: { mistMap: THREE.Texture | null }) {
 
     for (let i = 0; i < count; i += 1) {
       const i3 = i * 3;
-      positions[i3] = (Math.random() - 0.5) * 0.35;
-      positions[i3 + 1] = 1.4 + Math.random() * 0.35;
-      positions[i3 + 2] = (Math.random() - 0.5) * 0.35;
+      positions[i3] = origin[0] + (Math.random() - 0.5) * 0.5;
+      positions[i3 + 1] = origin[1] + 0.8 + Math.random() * 0.5;
+      positions[i3 + 2] = origin[2] + (Math.random() - 0.5) * 0.5;
       lives[i] = Math.random();
-      sizes[i] = 0.08 + Math.random() * 0.2;
+      sizes[i] = 0.1 + Math.random() * 0.22;
       seeds[i] = Math.random();
     }
 
@@ -56,38 +57,38 @@ function MistPoints({ mistMap }: { mistMap: THREE.Texture | null }) {
     });
 
     return { geometry: geo, material: mat };
-  }, [count, mistMap]);
+  }, [count, mistMap, origin]);
 
   useFrame((state) => {
     const mat = pointsRef.current?.material as THREE.ShaderMaterial | undefined;
     if (!mat) return;
 
-    const craft = sectionProgress(progress, "CRAFT");
-    const experience = sectionProgress(progress, "EXPERIENCE");
     let intensity = 0;
+    if (isInSection(progress, "HERO")) {
+      intensity = 0.2 + sectionProgress(progress, "HERO") * 0.15;
+    } else if (isInSection(progress, "CATEGORIES")) {
+      intensity = 0.25;
+    } else {
+      intensity = getFloralState(progress, state.clock.elapsedTime).smokeIntensity;
+    }
 
-    if (isInSection(progress, "CRAFT")) {
-      intensity = craft * 0.65;
-    } else if (isInSection(progress, "EXPERIENCE")) {
-      intensity = 0.65 + experience * 0.35;
+    if (isInSection(progress, "NOTES")) {
+      intensity = Math.max(intensity, 0.35);
     }
 
     mat.uniforms.uTime.value = state.clock.elapsedTime;
     mat.uniforms.uIntensity.value = intensity;
   });
 
-  return <points ref={pointsRef} geometry={geometry} material={material} />;
+  return <points ref={pointsRef} geometry={geometry} material={material} position={origin} />;
 }
 
-function MistWithTexture() {
+function MistWithTexture({ origin }: { origin: [number, number, number] }) {
   const mistMap = useTexture(EXPERIENCE_TEXTURES.mistWhite);
-  return <MistPoints mistMap={mistMap} />;
+  return <MistPoints mistMap={mistMap} origin={origin} />;
 }
 
-class MistErrorBoundary extends Component<
-  { children: ReactNode },
-  { hasError: boolean }
-> {
+class MistErrorBoundary extends Component<{ children: ReactNode; origin: [number, number, number] }, { hasError: boolean }> {
   state = { hasError: false };
 
   static getDerivedStateFromError() {
@@ -95,23 +96,30 @@ class MistErrorBoundary extends Component<
   }
 
   render() {
-    if (this.state.hasError) return <MistPoints mistMap={null} />;
+    if (this.state.hasError) return <MistPoints mistMap={null} origin={this.props.origin} />;
     return this.props.children;
   }
 }
 
-export default function SmokeParticles() {
+function MistLayer({ origin }: { origin: [number, number, number] }) {
   const { progress } = useScrollExperience();
-
-  if (!isInSection(progress, "CRAFT") && !isInSection(progress, "EXPERIENCE") && progress < 0.3) {
-    return null;
-  }
+  if (progress < 0.12 && !isInSection(progress, "HERO")) return null;
+  if (progress > 0.88) return null;
 
   return (
-    <MistErrorBoundary>
-      <Suspense fallback={<MistPoints mistMap={null} />}>
-        <MistWithTexture />
+    <MistErrorBoundary origin={origin}>
+      <Suspense fallback={<MistPoints mistMap={null} origin={origin} />}>
+        <MistWithTexture origin={origin} />
       </Suspense>
     </MistErrorBoundary>
+  );
+}
+
+export default function SmokeParticles() {
+  return (
+    <>
+      <MistLayer origin={[1.4, 0, 0]} />
+      <MistLayer origin={[0, 0, 0]} />
+    </>
   );
 }

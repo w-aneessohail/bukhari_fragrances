@@ -14,7 +14,12 @@ function useDebounce<T>(value: T, delay = 300) {
   return debounced;
 }
 
-export default function SearchBar() {
+type SearchBarProps = {
+  variant?: "default" | "light";
+};
+
+export default function SearchBar({ variant = "default" }: SearchBarProps) {
+  const isLight = variant === "light";
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +54,11 @@ export default function SearchBar() {
           onFocus={() => setIsOpen(true)}
           onBlur={() => window.setTimeout(() => setIsOpen(false), 150)}
           placeholder="Search fragrances…"
-          className="w-48 rounded-md border border-border bg-input px-3 py-1.5 text-sm text-text-primary transition focus:w-64 lg:w-56 lg:focus:w-72"
+          className={`w-48 rounded-md border px-3 py-1.5 text-sm transition focus:w-64 lg:w-56 lg:focus:w-72 ${
+            isLight
+              ? "border-white/20 bg-white/10 text-[#F5EDD6] placeholder:text-[#F5EDD6]/50"
+              : "border-border bg-input text-text-primary"
+          }`}
           aria-label="Search fragrances"
           aria-expanded={isOpen && debouncedQuery.length >= 2}
         />

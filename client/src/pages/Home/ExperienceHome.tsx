@@ -4,34 +4,23 @@ import * as THREE from "three";
 import { ScrollExperienceProvider } from "../../context/ScrollExperienceContext";
 import { useLenis } from "../../hooks/useLenis";
 import Scene from "../../components/3d/Scene";
-import ExperienceNavbar from "../../components/ui/Navbar";
-import HeroText from "../../components/ui/HeroText";
-import SectionText from "../../components/ui/SectionText";
-import CTASection from "../../components/ui/CTASection";
+import HomeScrollPanels from "../../components/home/HomeScrollPanels";
+import HomeExperienceFooter from "../../components/home/HomeExperienceFooter";
+import ExperienceCursor from "../../components/ui/ExperienceCursor";
 import LoadingScreen from "../../components/ui/LoadingScreen";
-import PageMeta from "../../components/seo/PageMeta";
-import JsonLd from "../../components/seo/JsonLd";
-import { buildOrganizationJsonLd } from "../../utils/jsonLd";
-import CartDrawer from "../../components/cart/CartDrawer";
-import { useCartStore } from "../../store/cartStore";
 import { EXPERIENCE_TEXTURES, PRELOAD_MODELS } from "../../constants/experienceAssets";
 
-const SCROLL_HEIGHT_VH = 600;
+const SCROLL_HEIGHT_VH = 580;
 
 PRELOAD_MODELS.forEach((url) => useGLTF.preload(url));
 
-function ExperienceContent() {
+export default function ExperienceHome() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { progress, scrollY } = useLenis();
   const [isMobile, setIsMobile] = useState(false);
   const [lowPerformance, setLowPerformance] = useState(false);
   const [assetsReady, setAssetsReady] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
-  const fetchCart = useCartStore((state) => state.fetchCart);
-
-  useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -80,7 +69,7 @@ function ExperienceContent() {
     const fallbackTimer = window.setTimeout(() => {
       setAssetsReady(true);
       setLoadProgress(1);
-    }, 4500);
+    }, 6000);
 
     return () => {
       window.clearTimeout(fallbackTimer);
@@ -100,16 +89,18 @@ function ExperienceContent() {
     <ScrollExperienceProvider value={scrollState}>
       <LoadingScreen progress={loadProgress} visible={!assetsReady} />
 
-      <div ref={scrollRef} className="experience-home relative bg-[#0A0804] text-[#F5EDD6]" style={{ height: `${SCROLL_HEIGHT_VH}vh` }}>
+      <div
+        ref={scrollRef}
+        className="experience-home experience-grain relative bg-[#050403] text-[#F5EDD6]"
+        style={{ height: `${SCROLL_HEIGHT_VH}vh` }}
+      >
         <div className="sticky top-0 h-screen w-full overflow-hidden">
           <Suspense fallback={null}>
             <Scene onPerformanceChange={setLowPerformance} />
           </Suspense>
 
-          <ExperienceNavbar />
-          <HeroText scrollerRef={scrollRef} />
-          <SectionText scrollerRef={scrollRef} />
-          <CTASection />
+          <HomeScrollPanels />
+          <ExperienceCursor />
 
           {import.meta.env.DEV ? (
             <div className="fixed bottom-4 left-4 z-[150] rounded bg-black/70 px-3 py-2 font-mono text-xs text-[#D4AF37]">
@@ -119,21 +110,7 @@ function ExperienceContent() {
         </div>
       </div>
 
-      <CartDrawer />
+      <HomeExperienceFooter />
     </ScrollExperienceProvider>
-  );
-}
-
-export default function ExperienceHome() {
-  return (
-    <>
-      <PageMeta
-        title="Bukhari Perfumes — Born from the Desert"
-        description="A cinematic journey through Arabian luxury fragrances. Discover oud, amber, and attar crafted by Bukhari Perfumes."
-        path="/"
-      />
-      <JsonLd data={buildOrganizationJsonLd()} />
-      <ExperienceContent />
-    </>
   );
 }

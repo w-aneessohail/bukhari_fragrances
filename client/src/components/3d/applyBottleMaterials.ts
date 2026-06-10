@@ -8,7 +8,7 @@ type BottleMaterialOptions = {
 };
 
 export function applyBottleMaterials(object: THREE.Object3D, options: BottleMaterialOptions = {}) {
-  const glassColor = options.glassColor ?? "#C8A96E";
+  const glassColor = options.glassColor ?? "#d4c4a0";
 
   object.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
@@ -20,21 +20,25 @@ export function applyBottleMaterials(object: THREE.Object3D, options: BottleMate
       child.material = new THREE.MeshPhysicalMaterial({
         color: new THREE.Color(COLORS.gold),
         metalness: 1,
-        roughness: 0.12,
-        envMapIntensity: 2.5
+        roughness: 0.08,
+        envMapIntensity: 3.5,
+        clearcoat: 1,
+        clearcoatRoughness: 0.1
       });
       return;
     }
 
     child.material = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color(glassColor),
-      transmission: 0.94,
-      roughness: 0.06,
-      metalness: 0,
-      ior: 1.48,
-      thickness: 0.45,
-      envMapIntensity: 2,
+      transmission: 0.97,
+      roughness: 0.02,
+      metalness: 0.05,
+      ior: 1.52,
+      thickness: 0.55,
+      envMapIntensity: 3,
       transparent: true,
+      clearcoat: 0.4,
+      clearcoatRoughness: 0.05,
       roughnessMap: options.roughnessMap ?? null
     });
   });

@@ -49,8 +49,8 @@ export default function AppRouter() {
     <BrowserRouter>
       <Suspense fallback={<RouteFallback />}>
         <Routes>
-          <Route index element={<HomePage />} />
           <Route element={<MainLayout />}>
+            <Route index element={<HomePage />} />
             <Route path="shop" element={<ShopPage />} />
             <Route path="search" element={<SearchPage />} />
             <Route path="offline" element={<OfflinePage />} />
