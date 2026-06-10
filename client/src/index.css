@@ -12,6 +12,10 @@ body {
   color: var(--text-primary);
 }
 
+.experience-home {
+  font-family: Inter, sans-serif;
+}
+
 @keyframes hero-gradient-shift {
   0% {
     background-position: 0% 50%;

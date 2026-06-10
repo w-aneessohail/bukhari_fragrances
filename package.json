@@ -7,6 +7,10 @@
     "server",
     "shared"
   ],
+  "overrides": {
+    "three": "0.169.0",
+    "@types/three": "0.169.0"
+  },
   "scripts": {
     "postinstall": "npm run db:generate --workspace=server",
     "dev": "npm run dev --workspace client & npm run dev --workspace server",
