@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Component, Suspense, useMemo, useRef, type ReactNode } from "react";
 import * as THREE from "three";
 import { useScrollExperience } from "../../context/ScrollExperienceContext";
-import { isInSection, sectionProgress } from "../../constants/scrollSections";
+import { isInSection, SECTIONS } from "../../constants/scrollSections";
 import { EXPERIENCE_TEXTURES } from "../../constants/experienceAssets";
 import { getFloralState } from "../../utils/scrollChoreography";
 import smokeVert from "../../shaders/smoke.vert.glsl?raw";
@@ -64,16 +64,14 @@ function MistPoints({ mistMap, origin }: { mistMap: THREE.Texture | null; origin
     if (!mat) return;
 
     let intensity = 0;
-    if (isInSection(progress, "HERO")) {
-      intensity = 0.2 + sectionProgress(progress, "HERO") * 0.15;
-    } else if (isInSection(progress, "CATEGORIES")) {
+    if (isInSection(progress, "CATEGORIES")) {
       intensity = 0.25;
-    } else {
+    } else if (progress >= SECTIONS.CATEGORIES.start) {
       intensity = getFloralState(progress, state.clock.elapsedTime).smokeIntensity;
     }
 
     if (isInSection(progress, "NOTES")) {
-      intensity = Math.max(intensity, 0.35);
+      intensity = Math.max(intensity, 0.55);
     }
 
     mat.uniforms.uTime.value = state.clock.elapsedTime;
@@ -103,8 +101,8 @@ class MistErrorBoundary extends Component<{ children: ReactNode; origin: [number
 
 function MistLayer({ origin }: { origin: [number, number, number] }) {
   const { progress } = useScrollExperience();
-  if (progress < 0.12 && !isInSection(progress, "HERO")) return null;
-  if (progress > 0.88) return null;
+  if (progress < SECTIONS.HERO.end) return null;
+  if (progress > 0.79) return null;
 
   return (
     <MistErrorBoundary origin={origin}>
@@ -118,8 +116,9 @@ function MistLayer({ origin }: { origin: [number, number, number] }) {
 export default function SmokeParticles() {
   return (
     <>
-      <MistLayer origin={[1.4, 0, 0]} />
-      <MistLayer origin={[0, 0, 0]} />
+      <MistLayer origin={[1.4, -0.5, -0.3]} />
+      <MistLayer origin={[0, -0.55, -0.35]} />
+      <MistLayer origin={[0, -1.8, -0.4]} />
     </>
   );
 }

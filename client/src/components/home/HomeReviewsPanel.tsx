@@ -19,7 +19,7 @@ const FALLBACK_REVIEWS = [
   }
 ];
 
-export default function HomeReviewsPanel({ visible }: { visible: boolean }) {
+export default function HomeReviewsPanel({ opacity }: { opacity: number }) {
   const { data: reviews = [] } = useQuery({
     queryKey: ["home-featured-reviews"],
     queryFn: fetchFeaturedReviews,
@@ -28,11 +28,16 @@ export default function HomeReviewsPanel({ visible }: { visible: boolean }) {
 
   const display = reviews.length > 0 ? reviews.slice(0, 2) : FALLBACK_REVIEWS;
 
+  if (opacity <= 0.01) return null;
+
   return (
     <div
-      className={`pointer-events-none absolute right-0 top-0 z-20 flex h-full w-[38%] items-center justify-end px-5 transition-all duration-1000 md:px-10 lg:px-14 ${
-        visible ? "translate-x-0 opacity-100" : "translate-x-6 opacity-0"
-      }`}
+      className="pointer-events-none absolute right-0 top-0 z-20 flex h-full w-[38%] items-center justify-end px-5 md:px-10 lg:px-14"
+      style={{
+        opacity,
+        transform: `translateX(${(1 - opacity) * 24}px)`,
+        visibility: opacity > 0.01 ? "visible" : "hidden"
+      }}
     >
       <div className="pointer-events-auto w-full max-w-sm space-y-3">
         <p className="text-[10px] uppercase tracking-[0.35em] text-white/40">Customer voices</p>

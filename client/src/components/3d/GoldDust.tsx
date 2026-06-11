@@ -54,9 +54,9 @@ export default function GoldDust() {
     const mat = pointsRef.current?.material as THREE.ShaderMaterial | undefined;
     if (!mat) return;
 
-    let intensity = 0.12;
+    let intensity = 0;
     if (isInSection(progress, "HERO")) {
-      intensity = 0.18 + sectionProgress(progress, "HERO") * 0.12;
+      intensity = 0;
     } else if (isInSection(progress, "POPULAR")) {
       intensity = 0.35 + sectionProgress(progress, "POPULAR") * 0.2;
     } else if (isInSection(progress, "NOTES")) {

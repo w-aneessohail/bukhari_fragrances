@@ -5,13 +5,11 @@ import { BlendFunction } from "postprocessing";
 import { Suspense, useState } from "react";
 import { Vector2 } from "three";
 import { useScrollExperience } from "../../context/ScrollExperienceContext";
+import { getCanvasOpacity } from "../../utils/scrollChoreography";
 import EnvironmentSetup from "./EnvironmentSetup";
 import CameraRig from "./CameraRig";
 import ScrollHeroBottle from "./ScrollHeroBottle";
 import FloralFocus from "./FloralFocus";
-import SmokeParticles from "./SmokeParticles";
-import GoldDust from "./GoldDust";
-import RosePetals from "./RosePetals";
 import ScentStream from "./ScentStream";
 
 function SceneContent() {
@@ -19,33 +17,40 @@ function SceneContent() {
     <group>
       <CameraRig />
       <EnvironmentSetup />
-      <GoldDust />
       <ScrollHeroBottle />
-      <FloralFocus />
       <ScentStream />
-      <SmokeParticles />
-      <RosePetals />
+      <FloralFocus />
     </group>
   );
 }
 
 type SceneProps = {
   onPerformanceChange?: (low: boolean) => void;
+  onReady?: () => void;
 };
 
-export default function Scene({ onPerformanceChange }: SceneProps) {
+export default function Scene({ onPerformanceChange, onReady }: SceneProps) {
   const { isMobile, progress } = useScrollExperience();
   const [dpr, setDpr] = useState(1.5);
-  const canvasOpacity = progress > 0.78 ? 1 - (progress - 0.78) / 0.12 : 1;
+  const canvasOpacity = getCanvasOpacity(progress);
 
   return (
     <div className="absolute inset-0 z-0 transition-opacity duration-700" style={{ opacity: canvasOpacity }}>
       <Canvas
         shadows
         dpr={dpr}
-        camera={{ fov: 36, near: 0.1, far: 100, position: [-1.15, 0.35, 5.5] }}
-        gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+        camera={{ fov: 32, near: 0.1, far: 100, position: [-2.55, 0.32, 6.1] }}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+          failIfMajorPerformanceCaveat: false
+        }}
         style={{ position: "absolute", inset: 0 }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0);
+          onReady?.();
+        }}
       >
         <PerformanceMonitor
           onDecline={() => {

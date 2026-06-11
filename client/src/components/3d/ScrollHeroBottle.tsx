@@ -1,80 +1,30 @@
-import { useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Component, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { useScrollExperience } from "../../context/ScrollExperienceContext";
-import { EXPERIENCE_MODELS, EXPERIENCE_TEXTURES } from "../../constants/experienceAssets";
+import { EXPERIENCE_MODELS } from "../../constants/experienceAssets";
 import { getBottleState } from "../../utils/scrollChoreography";
-import { applyBottleMaterials, createLabelPlane } from "./applyBottleMaterials";
 import SafeGlb, { PlaceholderBottle } from "./SafeGlb";
 
-function BottleModel({
-  glassColor = "#d4c4a0",
-  roughnessMap,
-  labelMap,
-  onReady
-}: {
-  glassColor?: string;
-  roughnessMap?: THREE.Texture;
-  labelMap?: THREE.Texture;
-  onReady?: (object: THREE.Object3D) => void;
-}) {
-  const labelRef = useRef<THREE.Group>(null);
-  const [labelAttached, setLabelAttached] = useState(false);
+type MaterialSnapshot = {
+  mat: THREE.Material;
+  opacity: number;
+  transparent: boolean;
+};
 
-  const handleReady = useCallback(
-    (object: THREE.Object3D) => {
-      applyBottleMaterials(object, {
-        glassColor,
-        roughnessMap: roughnessMap ?? null,
-        labelMap: labelMap ?? null
-      });
-      if (!labelRef.current || labelAttached || !labelMap) {
-        onReady?.(object);
-        return;
+function enhanceOriginalMaterials(object: THREE.Object3D, snapshots: MaterialSnapshot[]) {
+  snapshots.length = 0;
+  object.traverse((child) => {
+    if (!(child instanceof THREE.Mesh) || !child.material) return;
+
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    materials.forEach((mat) => {
+      snapshots.push({ mat, opacity: mat.opacity, transparent: mat.transparent });
+      if ("envMapIntensity" in mat) {
+        (mat as THREE.MeshStandardMaterial).envMapIntensity = 1.25;
       }
-      labelRef.current.add(createLabelPlane(labelMap));
-      setLabelAttached(true);
-      onReady?.(object);
-    },
-    [glassColor, labelMap, labelAttached, onReady, roughnessMap]
-  );
-
-  return (
-    <group>
-      <group ref={labelRef} />
-      <SafeGlb
-        url={EXPERIENCE_MODELS.heroBottle}
-        targetHeight={2.1}
-        fallback={<PlaceholderBottle glassColor={glassColor} />}
-        onReady={handleReady}
-      />
-    </group>
-  );
-}
-
-function BottleWithTextures(props: { onReady?: (object: THREE.Object3D) => void }) {
-  const textures = useTexture({
-    roughness: EXPERIENCE_TEXTURES.glassRoughness,
-    label: EXPERIENCE_TEXTURES.brandLabel
+    });
   });
-  return <BottleModel roughnessMap={textures.roughness} labelMap={textures.label} {...props} />;
-}
-
-class BottleTextureErrorBoundary extends Component<
-  { fallback: ReactNode; children: ReactNode },
-  { hasError: boolean }
-> {
-  state = { hasError: false };
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  render() {
-    if (this.state.hasError) return this.props.fallback;
-    return this.props.children;
-  }
 }
 
 export default function ScrollHeroBottle() {
@@ -83,10 +33,15 @@ export default function ScrollHeroBottle() {
   const pointerRotation = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
   const lastPointer = useRef({ x: 0, y: 0 });
+  const materialSnapshots = useRef<MaterialSnapshot[]>([]);
   const { progress } = useScrollExperience();
   const progressRef = useRef(progress);
   progressRef.current = progress;
   const { gl } = useThree();
+
+  const handleReady = useCallback((object: THREE.Object3D) => {
+    enhanceOriginalMaterials(object, materialSnapshots.current);
+  }, []);
 
   useEffect(() => {
     const el = gl.domElement;
@@ -146,36 +101,37 @@ export default function ScrollHeroBottle() {
       glow.intensity = bottleState.opacity * 2.5;
     }
 
-    group.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.material) {
-        const materials = Array.isArray(child.material) ? child.material : [child.material];
-        materials.forEach((mat) => {
-          mat.transparent = true;
-          mat.opacity = bottleState.opacity;
-        });
+    materialSnapshots.current.forEach(({ mat, opacity, transparent }) => {
+      if (bottleState.opacity < 0.999) {
+        mat.transparent = true;
+        mat.opacity = bottleState.opacity * opacity;
+      } else {
+        mat.opacity = opacity;
+        mat.transparent = transparent;
       }
     });
 
+    const targetRotationY = bottleState.baseRotationY + (bottleState.interactive ? pointerRotation.current.y : 0);
+
     if (bottleState.interactive) {
-      group.rotation.y = THREE.MathUtils.lerp(group.rotation.y, pointerRotation.current.y, 0.1);
+      group.rotation.y = THREE.MathUtils.lerp(group.rotation.y, targetRotationY, 0.1);
       group.rotation.x = THREE.MathUtils.lerp(group.rotation.x, pointerRotation.current.x, 0.1);
       group.rotation.z = Math.sin(state.clock.elapsedTime * 0.5) * 0.015;
     } else {
-      group.rotation.y = THREE.MathUtils.lerp(group.rotation.y, 0, 0.05);
+      group.rotation.y = THREE.MathUtils.lerp(group.rotation.y, targetRotationY, 0.05);
       group.rotation.x = THREE.MathUtils.lerp(group.rotation.x, 0, 0.05);
     }
   });
 
-  const fallback = <BottleModel glassColor="#d4c4a0" />;
-
   return (
     <group ref={groupRef}>
       <pointLight ref={glowRef} color="#f5e6c8" intensity={2.5} distance={5} decay={2} />
-      <BottleTextureErrorBoundary fallback={fallback}>
-        <Suspense fallback={fallback}>
-          <BottleWithTextures />
-        </Suspense>
-      </BottleTextureErrorBoundary>
+      <SafeGlb
+        url={EXPERIENCE_MODELS.heroBottle}
+        targetHeight={2.75}
+        fallback={<PlaceholderBottle />}
+        onReady={handleReady}
+      />
     </group>
   );
 }

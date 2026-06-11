@@ -4,6 +4,7 @@ import { useScrollExperience } from "../../context/ScrollExperienceContext";
 import {
   categoriesPanelOpacity,
   isInSection,
+  notesPanelOpacity,
   popularPanelOpacity,
   sectionProgress
 } from "../../constants/scrollSections";
@@ -110,11 +111,11 @@ export default function HomeScrollPanels() {
   const popularPair = [products[0], products[1]].filter(Boolean);
 
   const heroVisible = isInSection(progress, "HERO");
-  const notesVisible = isInSection(progress, "NOTES");
 
   const heroT = sectionProgress(progress, "HERO");
   const categoriesOp = categoriesPanelOpacity(progress);
   const popularOp = popularPanelOpacity(progress);
+  const notesOp = notesPanelOpacity(progress);
 
   return (
     <>
@@ -141,25 +142,28 @@ export default function HomeScrollPanels() {
         style={{ opacity: categoriesOp, visibility: categoriesOp > 0.01 ? "visible" : "hidden" }}
       >
         <div className="flex h-full items-center justify-end px-6 md:px-14 lg:px-20">
-          <div className="pointer-events-auto w-full max-w-sm text-white">
-            <p className="text-[10px] uppercase tracking-[0.35em] text-white/50">Collections</p>
-            <h2 className="mt-3 font-sans text-2xl font-light md:text-4xl">Categories we craft</h2>
+          <div
+            className="pointer-events-auto w-full max-w-sm"
+            style={{ color: categoriesOp >= 1 ? "#ffffff" : undefined }}
+          >
+            <p className="text-[10px] uppercase tracking-[0.35em] text-white">Collections</p>
+            <h2 className="mt-3 font-sans text-2xl font-light text-white md:text-4xl">Categories we craft</h2>
             <div className="mt-6 space-y-2">
               {categories.slice(0, 3).map((category) => (
                 <Link
                   key={category.slug}
                   to={`/shop?category=${category.slug}`}
-                  className="group flex items-center gap-3 border-b border-white/10 py-3 transition hover:border-[#D4AF37]/40"
+                  className="group flex items-center gap-3 border-b border-white/15 py-3 transition hover:border-[#D4AF37]/40"
                 >
                   {category.image ? (
-                    <img src={category.image} alt={category.name} className="h-11 w-11 object-cover opacity-85" />
+                    <img src={category.image} alt={category.name} className="h-11 w-11 object-cover" />
                   ) : (
                     <div className="h-11 w-11 bg-white/5" />
                   )}
                   <div>
                     <p className="text-sm text-white group-hover:text-[#D4AF37]">{category.name}</p>
                     {category.description ? (
-                      <p className="text-[11px] text-white/40 line-clamp-1">{category.description}</p>
+                      <p className="text-[11px] text-white/70 line-clamp-1">{category.description}</p>
                     ) : null}
                   </div>
                 </Link>
@@ -184,14 +188,14 @@ export default function HomeScrollPanels() {
             </div>
           </div>
         </div>
-        <p className="pointer-events-none absolute bottom-14 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.3em] text-white/40">
-          Most loved
+        <p className="pointer-events-none absolute bottom-16 left-1/2 -translate-x-1/2 text-center font-serif text-2xl tracking-[0.15em] text-white md:bottom-20 md:text-4xl lg:text-5xl">
+          Most Loved
         </p>
       </div>
 
-      {/* Screen 4 — leaf center, notes left, reviews right */}
-      <HomeNotesPanel visible={notesVisible} />
-      <HomeReviewsPanel visible={notesVisible} />
+      {/* Screen 4 — notes left, reviews right, synced with floral swap */}
+      <HomeNotesPanel opacity={notesOp} />
+      <HomeReviewsPanel opacity={notesOp} />
     </>
   );
 }

@@ -8,6 +8,6 @@ export function useScrollSection(progress: number) {
       return progress >= start && progress < end;
     });
 
-    return active ?? "OUTRO";
+    return active ?? "STORY";
   }, [progress]);
 }

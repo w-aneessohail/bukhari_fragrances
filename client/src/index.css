@@ -44,3 +44,20 @@ body {
   background-size: 200% 200%;
   animation: hero-gradient-shift 12s ease infinite;
 }
+
+@keyframes footer-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.footer-showcase-marquee {
+  animation: footer-marquee 45s linear infinite;
+}
+
+.footer-showcase-track:hover .footer-showcase-marquee {
+  animation-play-state: paused;
+}

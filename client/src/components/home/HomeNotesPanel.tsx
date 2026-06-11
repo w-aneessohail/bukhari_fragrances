@@ -8,7 +8,7 @@ const DEFAULT_NOTES = {
   base: ["Musk", "Sandalwood", "Vanilla"]
 };
 
-export default function HomeNotesPanel({ visible }: { visible: boolean }) {
+export default function HomeNotesPanel({ opacity }: { opacity: number }) {
   const { data: products = [] } = useQuery({
     queryKey: ["home-bestsellers"],
     queryFn: fetchBestsellerProducts,
@@ -25,11 +25,16 @@ export default function HomeNotesPanel({ visible }: { visible: boolean }) {
       }
     : DEFAULT_NOTES;
 
+  if (opacity <= 0.01) return null;
+
   return (
     <div
-      className={`pointer-events-none absolute left-0 top-0 z-20 flex h-full w-[38%] items-center px-5 transition-all duration-1000 md:px-10 lg:px-14 ${
-        visible ? "translate-x-0 opacity-100" : "-translate-x-6 opacity-0"
-      }`}
+      className="pointer-events-none absolute left-0 top-0 z-20 flex h-full w-[38%] items-center px-5 md:px-10 lg:px-14"
+      style={{
+        opacity,
+        transform: `translateX(${(1 - opacity) * -24}px)`,
+        visibility: opacity > 0.01 ? "visible" : "hidden"
+      }}
     >
       <div className="pointer-events-auto max-w-sm border border-white/10 bg-black/45 p-5 backdrop-blur-md md:p-6">
         <p className="text-[10px] uppercase tracking-[0.35em] text-white/40">Fragrance notes</p>
