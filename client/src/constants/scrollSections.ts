@@ -1,3 +1,5 @@
+import { easeInOutCubic, easeInOutQuart } from "../utils/easing";
+
 export const SECTIONS = {
   HERO: { start: 0, end: 0.07 },
   CATEGORIES: { start: 0.07, end: 0.17 },
@@ -20,9 +22,9 @@ export const NOTES_BEAT_COUNT = 3;
 export const HERITAGE_BEAT_COUNT = 3;
 export const RITUAL_BEAT_COUNT = 3;
 
-/** Each beat: long hold at full opacity, short crossfade, then next beat snaps to full. */
-export const BEAT_HOLD_RATIO = 0.86;
-export const BEAT_FADE_RATIO = 0.14;
+/** Each beat: long hold at full opacity, then a soft eased crossfade into the next. */
+export const BEAT_HOLD_RATIO = 0.78;
+export const BEAT_FADE_RATIO = 0.22;
 
 export function isInSection(progress: number, section: SectionKey) {
   const { start, end } = SECTIONS[section];
@@ -80,8 +82,7 @@ export function sectionBeat(progress: number, section: SectionKey, count: number
 export type BeatSlotVisual = { opacity: number; slide: number };
 
 /**
- * Scroll-linked beat visibility — long hold, quick crossfade, incoming reaches full opacity
- * as soon as the handoff completes (no extra scroll to "finish" fading in).
+ * Scroll-linked beat visibility — long hold, then eased crossfade (opacity + slide).
  */
 export function beatSlotVisual(
   sectionLocal: number,
@@ -95,16 +96,16 @@ export function beatSlotVisual(
 
   if (dist >= 0 && dist < 1) {
     if (dist <= hold) return { opacity: 1, slide: 0 };
-    const t = Math.min(1, (dist - hold) / fade);
-    return { opacity: 1 - t, slide: t };
+    const t = easeInOutQuart(Math.min(1, (dist - hold) / fade));
+    return { opacity: 1 - t, slide: easeInOutCubic(t) };
   }
 
   if (slotIndex > 0) {
     const prevDist = pos - (slotIndex - 1);
     if (prevDist > hold && prevDist <= 1) {
-      const t = Math.min(1, (prevDist - hold) / fade);
-      const opacity = Math.min(1, t * 1.4);
-      return { opacity: opacity > 0.94 ? 1 : opacity, slide: 1 - opacity };
+      const t = easeInOutQuart(Math.min(1, (prevDist - hold) / fade));
+      const opacity = easeInOutQuart(t);
+      return { opacity, slide: 1 - easeInOutCubic(t) };
     }
   }
 
