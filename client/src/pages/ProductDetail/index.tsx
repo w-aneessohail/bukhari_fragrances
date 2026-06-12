@@ -12,6 +12,7 @@ import ProductGallery from "../../components/product/ProductGallery";
 import ScentNoteWheel from "../../components/product/ScentNoteWheel";
 import SizeSelector from "../../components/product/SizeSelector";
 import WishlistButton from "../../components/product/WishlistButton";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { fetchProductBySlug } from "../../services/productService";
 import type { ProductSize } from "../../types/product.types";
 
@@ -63,18 +64,7 @@ export default function ProductDetailPage() {
   }, [product, selectedSize]);
 
   if (isLoading) {
-    return (
-      <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="aspect-[3/4] animate-pulse rounded-xl bg-bg-secondary" />
-          <div className="space-y-4">
-            <div className="h-10 w-2/3 animate-pulse rounded bg-bg-secondary" />
-            <div className="h-6 w-1/3 animate-pulse rounded bg-bg-secondary" />
-            <div className="h-24 animate-pulse rounded bg-bg-secondary" />
-          </div>
-        </div>
-      </section>
-    );
+    return <PageLoadingScreen label="Loading fragrance" />;
   }
 
   if (isError || !product) {

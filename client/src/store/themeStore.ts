@@ -30,7 +30,7 @@ function detectSystemTheme(): ThemeMode {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      theme: ThemeMode.LIGHT,
+      theme: ThemeMode.DARK,
       setTheme: (theme) => {
         const normalized = normalizeTheme(theme);
         applyTheme(normalized);

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { cancelOrder, fetchOrderTracking } from "../../services/orderService";
 
 function formatStatus(status: string) {
@@ -22,12 +23,7 @@ export default function OrderTrackingPage() {
   });
 
   if (isLoading) {
-    return (
-      <section className="mx-auto max-w-3xl px-4 py-10 md:px-6">
-        <div className="h-10 w-64 animate-pulse rounded bg-bg-secondary" />
-        <div className="mt-6 h-40 animate-pulse rounded-xl bg-bg-secondary" />
-      </section>
-    );
+    return <PageLoadingScreen label="Loading order" />;
   }
 
   if (isError || !data) {

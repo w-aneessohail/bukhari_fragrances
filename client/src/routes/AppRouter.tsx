@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import RouteLoadingFallback from "../components/ui/RouteLoadingFallback";
 import AdminLayout from "../layouts/AdminLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import CheckoutLayout from "../layouts/CheckoutLayout";
@@ -7,7 +8,10 @@ import MainLayout from "../layouts/MainLayout";
 import AdminRoute from "./AdminRoute";
 import PrivateRoute from "./PrivateRoute";
 
-const HomePage = lazy(() => import("../pages/Home"));
+const HomeIndexRedirect = lazy(() => import("../pages/Home"));
+const ClassicHomePage = lazy(() => import("../pages/Home/ClassicHome"));
+const ExperienceHomePage = lazy(() => import("../pages/Home/ExperienceHome"));
+const ModernHomePage = lazy(() => import("../pages/Home/ModernHome"));
 const ShopPage = lazy(() => import("../pages/Shop"));
 const ProductDetailPage = lazy(() => import("../pages/ProductDetail"));
 const AboutPage = lazy(() => import("../pages/About"));
@@ -36,21 +40,16 @@ const AdminDiscountsPage = lazy(() => import("../pages/admin/Discounts"));
 const SearchPage = lazy(() => import("../pages/Search"));
 const OfflinePage = lazy(() => import("../pages/Offline"));
 
-function RouteFallback() {
-  return (
-    <div className="flex min-h-[40vh] items-center justify-center font-body text-text-secondary">
-      Loading...
-    </div>
-  );
-}
-
 export default function AppRouter() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<RouteFallback />}>
+      <Suspense fallback={<RouteLoadingFallback />}>
         <Routes>
           <Route element={<MainLayout />}>
-            <Route index element={<HomePage />} />
+            <Route index element={<HomeIndexRedirect />} />
+            <Route path="home-classic" element={<ClassicHomePage />} />
+            <Route path="home-experience" element={<ExperienceHomePage />} />
+            <Route path="home-modern" element={<ModernHomePage />} />
             <Route path="shop" element={<ShopPage />} />
             <Route path="search" element={<SearchPage />} />
             <Route path="offline" element={<OfflinePage />} />

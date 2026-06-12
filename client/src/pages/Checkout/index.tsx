@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import OrderSummary from "../../components/checkout/OrderSummary";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { fetchCheckoutSummary, placeOrder } from "../../services/orderService";
 import { fetchAddresses, type Address } from "../../services/userService";
 import { useCartStore } from "../../store/cartStore";
@@ -131,7 +132,7 @@ export default function CheckoutPage() {
   };
 
   if (isLoading || !summary) {
-    return <p className="text-text-secondary">Preparing checkout…</p>;
+    return <PageLoadingScreen label="Preparing checkout" />;
   }
 
   if (step === 4 && placedOrder) {

@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { bootstrapSession } from "../../services/authService";
+import LoadingScreen from "../ui/LoadingScreen";
 
 type AuthBootstrapProps = {
   children: ReactNode;
@@ -7,17 +8,24 @@ type AuthBootstrapProps = {
 
 export default function AuthBootstrap({ children }: AuthBootstrapProps) {
   const [ready, setReady] = useState(false);
+  const [progress, setProgress] = useState(0.2);
 
   useEffect(() => {
-    bootstrapSession().finally(() => setReady(true));
+    const timer = window.setInterval(() => {
+      setProgress((value) => (value >= 0.85 ? 0.85 : value + 0.05));
+    }, 100);
+
+    bootstrapSession().finally(() => {
+      window.clearInterval(timer);
+      setProgress(1);
+      setReady(true);
+    });
+
+    return () => window.clearInterval(timer);
   }, []);
 
   if (!ready) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-bg-primary text-text-secondary">
-        Loading…
-      </div>
-    );
+    return <LoadingScreen progress={progress} visible label="Loading" />;
   }
 
   return children;

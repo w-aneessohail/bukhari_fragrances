@@ -14,12 +14,7 @@ function useDebounce<T>(value: T, delay = 300) {
   return debounced;
 }
 
-type SearchBarProps = {
-  variant?: "default" | "light";
-};
-
-export default function SearchBar({ variant = "default" }: SearchBarProps) {
-  const isLight = variant === "light";
+export default function SearchBar() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -54,18 +49,14 @@ export default function SearchBar({ variant = "default" }: SearchBarProps) {
           onFocus={() => setIsOpen(true)}
           onBlur={() => window.setTimeout(() => setIsOpen(false), 150)}
           placeholder="Search fragrances…"
-          className={`w-48 rounded-md border px-3 py-1.5 text-sm transition focus:w-64 lg:w-56 lg:focus:w-72 ${
-            isLight
-              ? "border-white/20 bg-white/10 text-[#F5EDD6] placeholder:text-[#F5EDD6]/50"
-              : "border-border bg-input text-text-primary"
-          }`}
+          className="w-48 rounded-md border border-border bg-input px-3 py-1.5 text-sm text-text-primary transition placeholder:text-text-secondary focus:w-64 lg:w-56 lg:focus:w-72"
           aria-label="Search fragrances"
           aria-expanded={isOpen && debouncedQuery.length >= 2}
         />
       </form>
 
       {isOpen && debouncedQuery.length >= 2 ? (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-xl border border-border bg-card p-3 shadow-luxury">
+        <div className="site-panel absolute right-0 top-full z-50 mt-2 w-80 rounded-xl p-3">
           {isFetching ? (
             <p className="px-2 py-3 text-sm text-text-secondary">Searching…</p>
           ) : results.length === 0 ? (
@@ -76,7 +67,7 @@ export default function SearchBar({ variant = "default" }: SearchBarProps) {
                 <li key={product.id}>
                   <Link
                     to={`/product/${product.slug}`}
-                    className="block rounded-lg px-2 py-2 text-sm hover:bg-bg-secondary"
+                    className="block rounded-lg px-2 py-2 text-sm text-text-primary hover:bg-bg-secondary hover:text-accent-gold"
                     onClick={() => setIsOpen(false)}
                   >
                     {product.name}

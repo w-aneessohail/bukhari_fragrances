@@ -8,6 +8,7 @@ import {
   type AdminDiscount,
   type DiscountInput
 } from "../../../services/adminDiscountService";
+import PageLoadingScreen from "../../../components/ui/PageLoadingScreen";
 
 const emptyForm: DiscountInput = {
   code: "",
@@ -79,6 +80,10 @@ export default function AdminDiscountsPage() {
       await createMutation.mutateAsync(form);
     }
   };
+
+  if (isLoading) {
+    return <PageLoadingScreen label="Loading discounts" />;
+  }
 
   return (
     <div>
@@ -203,13 +208,7 @@ export default function AdminDiscountsPage() {
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-text-secondary">
-                  Loading…
-                </td>
-              </tr>
-            ) : discounts.length === 0 ? (
+            {discounts.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-text-secondary">
                   No discount codes yet.

@@ -5,6 +5,7 @@ import {
   fetchAdminOrders,
   updateAdminOrderStatus
 } from "../../../services/adminService";
+import PageLoadingScreen from "../../../components/ui/PageLoadingScreen";
 
 const statuses = [
   "PENDING",
@@ -38,6 +39,10 @@ export default function AdminOrdersPage() {
   });
 
   const orders = response?.data ?? [];
+
+  if (isLoading) {
+    return <PageLoadingScreen label="Loading orders" />;
+  }
 
   const handleExport = async () => {
     const csv = await exportAdminOrdersCsv({ status: statusFilter || undefined, search: search || undefined });
@@ -87,9 +92,7 @@ export default function AdminOrdersPage() {
         />
       </div>
 
-      {isLoading ? (
-        <p className="mt-8 text-text-secondary">Loading orders…</p>
-      ) : orders.length === 0 ? (
+      {orders.length === 0 ? (
         <p className="mt-8 text-text-secondary">No orders found.</p>
       ) : (
         <div className="mt-8 overflow-x-auto rounded-xl border border-border">

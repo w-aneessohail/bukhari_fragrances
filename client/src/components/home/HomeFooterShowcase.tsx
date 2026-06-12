@@ -64,7 +64,7 @@ function ProductCard({ product }: { product: ShowcaseProduct }) {
       to={`/product/${product.slug}`}
       className="footer-showcase-card group relative mx-3 block w-44 shrink-0 md:mx-4 md:w-52"
     >
-      <div className="overflow-hidden border border-white/10 bg-black/40 transition-all duration-300 group-hover:z-10 group-hover:scale-110 group-hover:border-[#D4AF37]/50 group-hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]">
+      <div className="overflow-hidden border border-border bg-card transition-all duration-300 group-hover:z-10 group-hover:scale-110 group-hover:border-accent-gold/50 group-hover:shadow-luxury">
         {product.mainImage ? (
           <img
             src={product.mainImage}
@@ -72,18 +72,18 @@ function ProductCard({ product }: { product: ShowcaseProduct }) {
             className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105 md:h-48"
           />
         ) : (
-          <div className="flex h-40 items-center justify-center bg-white/5 md:h-48">
-            <span className="text-[10px] uppercase tracking-widest text-white/30">Bukhari</span>
+          <div className="flex h-40 items-center justify-center bg-bg-secondary md:h-48">
+            <span className="text-[10px] uppercase tracking-widest text-text-secondary">Bukhari</span>
           </div>
         )}
         <div className="p-3 md:p-4">
-          <p className="font-serif text-sm text-white md:text-base">{product.name}</p>
+          <p className="font-serif text-sm text-text-primary md:text-base">{product.name}</p>
           {product.scentFamily ? (
-            <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/45">
+            <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-text-secondary">
               {product.scentFamily}
             </p>
           ) : null}
-          <p className="mt-2 text-xs text-[#D4AF37] md:text-sm">
+          <p className="mt-2 text-xs text-accent-gold md:text-sm">
             {formatPrice(product.salePrice ?? product.price)}
           </p>
         </div>
@@ -114,10 +114,10 @@ export default function HomeFooterShowcase() {
   const track = [...items, ...items];
 
   return (
-    <section className="relative overflow-hidden border-t border-white/10 py-10 md:py-14">
+    <section className="relative overflow-hidden border-t border-border py-10 md:py-14">
       <div className="mb-6 px-6 text-center md:px-12">
-        <p className="text-[10px] uppercase tracking-[0.4em] text-[#D4AF37]/80">Discover</p>
-        <h3 className="mt-2 font-serif text-2xl text-white md:text-3xl">Our finest creations</h3>
+        <p className="text-[10px] uppercase tracking-[0.4em] text-accent-gold/80">Discover</p>
+        <h3 className="mt-2 font-serif text-2xl text-text-primary md:text-3xl">Our finest creations</h3>
       </div>
 
       <div className="footer-showcase-track group/track relative">
@@ -130,4 +130,3 @@ export default function HomeFooterShowcase() {
     </section>
   );
 }
-

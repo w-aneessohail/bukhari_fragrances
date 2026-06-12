@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { CartIcon, HeartIcon } from "../../icons/NavIcons";
@@ -7,6 +6,13 @@ import { useAuthStore } from "../../../store/authStore";
 import { useCartDrawerStore } from "../../../store/cartDrawerStore";
 import { useCartStore } from "../../../store/cartStore";
 import { useWishlistStore } from "../../../store/wishlistStore";
+import {
+  ACTIVE_HOME_PATH,
+  HOME_VARIANT_LABELS,
+  isActiveHomePath,
+  isExperienceHomePath,
+  otherHomeRoutes
+} from "../../../constants/homePages";
 import SearchBar from "./SearchBar";
 import ThemeToggle from "./ThemeToggle";
 import UserMenu from "./UserMenu";
@@ -18,36 +24,10 @@ type NavbarProps = {
 export default function Navbar({ isScrolled }: NavbarProps) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const isHome = pathname === "/";
-  const [inExperienceScroll, setInExperienceScroll] = useState(isHome);
+  const onActiveHome = isActiveHomePath(pathname);
+  const onExperienceScroll = isExperienceHomePath(pathname);
+  const transparentTop = !isScrolled && !onExperienceScroll;
 
-  useEffect(() => {
-    if (!isHome) {
-      setInExperienceScroll(false);
-      return undefined;
-    }
-
-    const update = () => {
-      const experience = document.querySelector(".experience-home");
-      if (!experience) {
-        setInExperienceScroll(true);
-        return;
-      }
-      const rect = experience.getBoundingClientRect();
-      const total = experience.scrollHeight - window.innerHeight;
-      setInExperienceScroll(window.scrollY < total * 0.88);
-    };
-
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [isHome]);
-
-  const overExperience = isHome && inExperienceScroll;
   const itemCount = useCartStore((state) => state.cart.itemCount);
   const openCartDrawer = useCartDrawerStore((state) => state.open);
   const badgePulse = useCartDrawerStore((state) => state.badgePulse);
@@ -59,36 +39,42 @@ export default function Navbar({ isScrolled }: NavbarProps) {
   return (
     <header
       className={`sticky top-0 z-50 border-b transition-all ${
-        overExperience
+        transparentTop
           ? "border-transparent bg-transparent"
-          : isScrolled
-            ? "border-border bg-navbar/95 shadow-luxury backdrop-blur-md"
-            : "border-border bg-transparent"
+          : "border-border bg-navbar/95 shadow-luxury backdrop-blur-md"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <Link
-          to="/"
-          className={`shrink-0 font-heading text-xl sm:text-2xl ${
-            isHome ? "text-accent-gold underline decoration-accent-gold/40 underline-offset-4" : "text-accent-gold"
+          to={ACTIVE_HOME_PATH}
+          className={`shrink-0 font-heading text-xl text-accent-gold sm:text-2xl ${
+            onActiveHome ? "underline decoration-accent-gold/40 underline-offset-4" : ""
           }`}
-          aria-current={isHome ? "page" : undefined}
+          aria-current={onActiveHome ? "page" : undefined}
         >
           Bukhari Perfumes
         </Link>
 
-        <nav
-          className={`hidden items-center gap-6 font-body text-sm lg:flex ${
-            overExperience ? "text-[#F5EDD6]/80" : "text-text-secondary"
-          }`}
-        >
+        <nav className="hidden items-center gap-6 font-body text-sm text-text-secondary lg:flex">
           <Link
-            to="/"
-            className={`transition hover:text-accent-gold ${isHome ? "text-accent-gold" : ""}`}
-            aria-current={isHome ? "page" : undefined}
+            to={ACTIVE_HOME_PATH}
+            className={`transition hover:text-accent-gold ${onActiveHome ? "text-accent-gold" : ""}`}
+            aria-current={onActiveHome ? "page" : undefined}
           >
             {t("nav.home")}
           </Link>
+          {import.meta.env.DEV
+            ? otherHomeRoutes().map(([variant, path]) => (
+                <Link
+                  key={variant}
+                  to={path}
+                  className="text-[10px] uppercase tracking-widest text-text-secondary/60 transition hover:text-accent-gold"
+                  title={`Preview ${HOME_VARIANT_LABELS[variant]} homepage`}
+                >
+                  {HOME_VARIANT_LABELS[variant]}
+                </Link>
+              ))
+            : null}
           <Link
             to="/shop"
             className={`transition hover:text-accent-gold ${pathname === "/shop" ? "text-accent-gold" : ""}`}
@@ -110,17 +96,12 @@ export default function Navbar({ isScrolled }: NavbarProps) {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <SearchBar variant={overExperience ? "light" : "default"} />
-
-          <ThemeToggle variant={overExperience ? "light" : "default"} />
+          <SearchBar />
+          <ThemeToggle />
 
           <Link
             to={wishlistTarget}
-            className={`relative rounded-full p-2 transition hover:text-accent-gold ${
-              overExperience
-                ? "text-[#F5EDD6]/80 hover:bg-white/10"
-                : "text-text-secondary hover:bg-card"
-            }`}
+            className="relative rounded-full p-2 text-text-secondary transition hover:bg-card hover:text-accent-gold"
             aria-label="Wishlist"
           >
             <HeartIcon />
@@ -134,11 +115,7 @@ export default function Navbar({ isScrolled }: NavbarProps) {
           <button
             type="button"
             onClick={openCartDrawer}
-            className={`relative rounded-full p-2 transition hover:text-accent-gold ${
-              overExperience
-                ? "text-[#F5EDD6]/80 hover:bg-white/10"
-                : "text-text-secondary hover:bg-card"
-            }`}
+            className="relative rounded-full p-2 text-text-secondary transition hover:bg-card hover:text-accent-gold"
             aria-label="Open cart"
           >
             <CartIcon />
@@ -159,11 +136,7 @@ export default function Navbar({ isScrolled }: NavbarProps) {
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition hover:border-accent-gold hover:text-accent-gold sm:px-4 sm:text-sm ${
-                  overExperience
-                    ? "border-white/25 text-[#F5EDD6]/90"
-                    : "border-border text-text-secondary"
-                }`}
+                className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-text-primary transition hover:border-accent-gold hover:text-accent-gold sm:px-4 sm:text-sm"
               >
                 Log in
               </Link>

@@ -7,6 +7,7 @@ import {
   fetchScentDiary,
   type ScentDiaryInput
 } from "../../services/scentDiaryService";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { fetchProducts } from "../../services/productService";
 
 export default function ScentDiaryPage() {
@@ -45,6 +46,10 @@ export default function ScentDiaryPage() {
     mutationFn: deleteScentDiaryEntry,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["scent-diary"] })
   });
+
+  if (isLoading) {
+    return <PageLoadingScreen label="Loading diary" />;
+  }
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-10 md:px-6">
@@ -152,9 +157,7 @@ export default function ScentDiaryPage() {
         </form>
       ) : null}
 
-      {isLoading ? (
-        <p className="mt-8 text-text-secondary">Loading diary…</p>
-      ) : entries.length === 0 ? (
+      {entries.length === 0 ? (
         <p className="mt-8 text-text-secondary">No entries yet. Log your first wear above.</p>
       ) : (
         <ul className="mt-8 space-y-4">

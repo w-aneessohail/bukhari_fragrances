@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { fetchOrders } from "../../services/orderService";
 
 const tabs = ["All", "Active", "Delivered", "Cancelled"] as const;
@@ -31,6 +32,10 @@ export default function OrdersPage() {
     [activeTab, orders]
   );
 
+  if (isLoading) {
+    return <PageLoadingScreen label="Loading orders" />;
+  }
+
   return (
     <section className="mx-auto max-w-4xl px-4 py-10 md:px-6">
       <h1 className="font-heading text-4xl text-accent-gold">Order history</h1>
@@ -51,14 +56,8 @@ export default function OrdersPage() {
         ))}
       </div>
 
-      {isLoading ? (
-        <div className="mt-8 space-y-4">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="h-24 animate-pulse rounded-xl bg-bg-secondary" />
-          ))}
-        </div>
-      ) : filteredOrders.length === 0 ? (
-        <div className="mt-10 rounded-xl border border-border bg-card p-10 text-center">
+      {filteredOrders.length === 0 ? (
+        <div className="site-panel mt-10 rounded-xl p-10 text-center">
           <p className="text-text-secondary">No orders in this view.</p>
           <Link to="/shop" className="mt-6 inline-block text-accent-gold underline">
             Start shopping

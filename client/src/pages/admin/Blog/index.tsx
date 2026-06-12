@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import PageLoadingScreen from "../../../components/ui/PageLoadingScreen";
 import { createBlogPost, deleteBlogPost, fetchAdminBlogPosts } from "../../../services/blogService";
 
 export default function AdminBlogPage() {
@@ -41,6 +42,10 @@ export default function AdminBlogPage() {
     mutationFn: deleteBlogPost,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-blog"] })
   });
+
+  if (isLoading) {
+    return <PageLoadingScreen label="Loading articles" />;
+  }
 
   return (
     <div>
@@ -106,10 +111,7 @@ export default function AdminBlogPage() {
 
       <div className="mt-10">
         <h2 className="font-heading text-xl text-text-primary">All articles</h2>
-        {isLoading ? (
-          <p className="mt-4 text-text-secondary">Loading…</p>
-        ) : (
-          <ul className="mt-4 space-y-3">
+        <ul className="mt-4 space-y-3">
             {posts.map((post) => (
               <li key={post.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border p-4">
                 <div>
@@ -133,7 +135,6 @@ export default function AdminBlogPage() {
               </li>
             ))}
           </ul>
-        )}
       </div>
     </div>
   );

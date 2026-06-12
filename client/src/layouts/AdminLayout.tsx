@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/layout/Navbar/ThemeToggle";
+import { ACTIVE_HOME_PATH } from "../constants/homePages";
 import { logoutUser } from "../services/authService";
 import { useAuthStore } from "../store/authStore";
 
@@ -24,9 +26,9 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary md:flex">
+    <div className="min-h-screen text-text-primary md:flex">
       <aside
-        className={`border-r border-border bg-bg-secondary p-4 transition-all ${
+        className={`site-panel m-0 rounded-none border-r border-border p-4 md:m-0 md:rounded-none ${
           isCollapsed ? "w-20" : "w-64"
         }`}
       >
@@ -35,14 +37,17 @@ export default function AdminLayout() {
           <button
             type="button"
             onClick={() => setIsCollapsed((value) => !value)}
-            className="rounded border border-border px-2 py-1 text-xs"
+            className="rounded border border-border px-2 py-1 text-xs text-text-secondary"
           >
             {isCollapsed ? ">" : "<"}
           </button>
         </div>
 
         <nav className="space-y-2">
-          <Link to="/" className="mb-4 block rounded px-3 py-2 text-sm text-text-secondary hover:text-accent-gold">
+          <Link
+            to={ACTIVE_HOME_PATH}
+            className="mb-4 block rounded px-3 py-2 text-sm text-text-secondary hover:text-accent-gold"
+          >
             {isCollapsed ? "←" : "← Back to store"}
           </Link>
 
@@ -62,19 +67,22 @@ export default function AdminLayout() {
         </nav>
       </aside>
 
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-4 md:p-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
           <div>
             <p className="text-sm text-text-secondary">Signed in as</p>
             <p className="font-medium text-text-primary">{user?.name ?? "Admin"}</p>
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded border border-border px-4 py-2 text-sm text-text-secondary hover:border-accent-gold hover:text-accent-gold"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded border border-border px-4 py-2 text-sm text-text-secondary hover:border-accent-gold hover:text-accent-gold"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
         <Outlet />
       </main>

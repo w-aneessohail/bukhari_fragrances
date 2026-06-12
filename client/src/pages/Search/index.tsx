@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../../components/product/ProductCard";
 import PageMeta from "../../components/seo/PageMeta";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { searchProducts } from "../../services/productService";
 
 export default function SearchPage() {
@@ -16,6 +17,10 @@ export default function SearchPage() {
 
   const products = data?.data ?? [];
 
+  if (query && isLoading) {
+    return <PageLoadingScreen label="Searching" />;
+  }
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
       <PageMeta title={`Search: ${query || "Fragrances"}`} path={`/search?q=${encodeURIComponent(query)}`} />
@@ -27,12 +32,6 @@ export default function SearchPage() {
 
       {!query ? (
         <p className="mt-10 text-text-secondary">Try searching for oud, rose, amber, or attar.</p>
-      ) : isLoading ? (
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="h-80 animate-pulse rounded-xl bg-bg-secondary" />
-          ))}
-        </div>
       ) : products.length === 0 ? (
         <p className="mt-10 text-text-secondary">No fragrances matched your search.</p>
       ) : (

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import LoadingScreen from "../ui/LoadingScreen";
 import { fetchSystemHealth } from "../../services/healthService";
 
 type GateStatus = "checking" | "ready" | "error";
@@ -10,12 +11,15 @@ type SystemHealthGateProps = {
 export default function SystemHealthGate({ children }: SystemHealthGateProps) {
   const [status, setStatus] = useState<GateStatus>("checking");
   const [message, setMessage] = useState("");
+  const [progress, setProgress] = useState(0.15);
 
   const verifyHealth = useCallback(async () => {
     setStatus("checking");
+    setProgress(0.2);
     const result = await fetchSystemHealth();
 
     if (result.ok) {
+      setProgress(1);
       setStatus("ready");
       setMessage("");
       return;
@@ -29,22 +33,25 @@ export default function SystemHealthGate({ children }: SystemHealthGateProps) {
     void verifyHealth();
   }, [verifyHealth]);
 
+  useEffect(() => {
+    if (status !== "checking") return undefined;
+    const timer = window.setInterval(() => {
+      setProgress((value) => (value >= 0.88 ? 0.88 : value + 0.06));
+    }, 120);
+    return () => window.clearInterval(timer);
+  }, [status]);
+
   if (status === "checking") {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-bg-primary px-6 text-center">
-        <p className="font-heading text-xl text-accent-gold">Bukhari Perfumes</p>
-        <p className="text-sm text-text-secondary">Checking database connection…</p>
-      </div>
-    );
+    return <LoadingScreen progress={progress} visible label="Connecting" />;
   }
 
   if (status === "error") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-bg-primary px-6 text-center">
-        <div className="max-w-md space-y-3">
-          <p className="font-heading text-2xl text-accent-gold">Service unavailable</p>
-          <p className="text-sm text-text-secondary">{message}</p>
-          <ul className="text-left text-xs text-text-secondary">
+      <div className="experience-grain flex min-h-screen flex-col items-center justify-center gap-6 bg-[#050403] px-6 text-center text-[#F5EDD6]">
+        <div className="site-panel max-w-md space-y-3 p-8">
+          <p className="font-heading text-2xl text-[#D4AF37]">Service unavailable</p>
+          <p className="text-sm text-white/60">{message}</p>
+          <ul className="text-left text-xs text-white/50">
             <li>1. Start PostgreSQL on your machine</li>
             <li>2. Confirm DATABASE_URL in the project .env file</li>
             <li>3. Run npm run dev:server in a terminal</li>
@@ -53,7 +60,7 @@ export default function SystemHealthGate({ children }: SystemHealthGateProps) {
         <button
           type="button"
           onClick={() => void verifyHealth()}
-          className="rounded-full bg-accent-gold px-6 py-2 text-sm font-semibold text-bg-primary transition hover:opacity-90"
+          className="rounded-full bg-[#D4AF37] px-6 py-2 text-sm font-semibold text-[#050403] transition hover:opacity-90"
         >
           Retry connection
         </button>

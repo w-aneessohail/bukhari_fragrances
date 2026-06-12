@@ -1,4 +1,5 @@
 import AuthBootstrap from "./components/auth/AuthBootstrap";
+import ExperienceSiteShell from "./components/layout/ExperienceSiteShell";
 import InstallPrompt from "./components/pwa/InstallPrompt";
 import SystemHealthGate from "./components/system/SystemHealthGate";
 import AppRouter from "./routes/AppRouter";
@@ -8,8 +9,10 @@ export default function App() {
   return (
     <SystemHealthGate>
       <AuthBootstrap>
-        <AppRouter />
-        <InstallPrompt />
+        <ExperienceSiteShell>
+          <AppRouter />
+          <InstallPrompt />
+        </ExperienceSiteShell>
       </AuthBootstrap>
     </SystemHealthGate>
   );

@@ -82,7 +82,12 @@ function scoreProduct(product: ProductSummary, answers: Answers) {
   return Math.min(Math.round(score), 99);
 }
 
-export default function ScentFinderSection() {
+type ScentFinderSectionProps = {
+  tone?: "default" | "experience";
+};
+
+export default function ScentFinderSection({ tone = "experience" }: ScentFinderSectionProps) {
+  const isExperience = tone === "experience";
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [showResults, setShowResults] = useState(false);
@@ -124,12 +129,22 @@ export default function ScentFinderSection() {
   };
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-16 md:px-6">
-      <div className="rounded-2xl border border-border bg-card p-8">
+    <section
+      className={`mx-auto max-w-5xl px-4 py-16 md:px-6 ${
+        isExperience ? "border-b border-border" : ""
+      }`}
+    >
+      <div
+        className="rounded-2xl border border-border bg-card p-8 backdrop-blur-md"
+      >
         <h2 className="font-heading text-3xl text-accent-gold">Find your scent</h2>
-        <p className="mt-2 text-text-secondary">Answer a few questions and we will recommend your perfect match.</p>
+        <p className="mt-2 text-text-secondary">
+          Answer a few questions and we will recommend your perfect match.
+        </p>
 
-        <div className="mt-6 h-2 overflow-hidden rounded-full bg-bg-secondary">
+        <div
+          className="mt-6 h-2 overflow-hidden rounded-full bg-bg-secondary"
+        >
           <div
             className="h-full rounded-full bg-accent-gold transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -157,14 +172,16 @@ export default function ScentFinderSection() {
           </div>
         ) : (
           <div className="mt-8">
-            <h3 className="font-heading text-2xl text-text-primary">Your top matches</h3>
+            <h3 className="font-heading text-2xl text-text-primary">
+              Your top matches
+            </h3>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               {recommendations.map(({ product, match }) => (
                 <div key={product.id} className="relative">
                   <span className="absolute right-2 top-2 z-10 rounded-full bg-accent-gold px-2 py-1 text-xs font-semibold text-bg-primary">
                     {match}% match
                   </span>
-                  <ProductCard product={product} />
+                  <ProductCard product={product} tone={tone} />
                 </div>
               ))}
             </div>
@@ -172,7 +189,7 @@ export default function ScentFinderSection() {
               <button
                 type="button"
                 onClick={resetQuiz}
-                className="rounded-lg border border-border px-4 py-2 text-sm hover:border-accent-gold hover:text-accent-gold"
+                className="rounded-lg border border-border px-4 py-2 text-sm text-text-primary hover:border-accent-gold hover:text-accent-gold"
               >
                 Retake quiz
               </button>

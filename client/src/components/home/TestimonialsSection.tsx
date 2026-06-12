@@ -3,7 +3,12 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { fetchFeaturedReviews } from "../../services/reviewService";
 
-export default function TestimonialsSection() {
+type TestimonialsSectionProps = {
+  tone?: "default" | "experience";
+};
+
+export default function TestimonialsSection({ tone = "experience" }: TestimonialsSectionProps) {
+  const isExperience = tone === "experience";
   const { data: reviews = [], isLoading } = useQuery({
     queryKey: ["featured-reviews"],
     queryFn: fetchFeaturedReviews
@@ -46,14 +51,20 @@ export default function TestimonialsSection() {
         ];
 
   return (
-    <section className="overflow-hidden bg-bg-secondary py-16">
+    <section
+      className={`overflow-hidden py-16 ${isExperience ? "border-b border-border" : "bg-bg-secondary"}`}
+    >
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <h2 className="font-heading text-3xl text-accent-gold">What our customers say</h2>
-        <p className="mt-2 text-text-secondary">Real experiences from fragrance lovers across Pakistan.</p>
+        <p className="mt-2 text-text-secondary">
+          Real experiences from fragrance lovers across Pakistan.
+        </p>
       </div>
 
       {isLoading ? (
-        <div className="mx-auto mt-8 h-32 max-w-7xl animate-pulse rounded-xl bg-card px-4 md:px-6" />
+        <div
+          className="mx-auto mt-8 h-32 max-w-7xl animate-pulse rounded-xl bg-card px-4 md:px-6"
+        />
       ) : (
         <div className="mt-10 space-y-6">
           {[0, 1].map((row) => (
@@ -66,16 +77,20 @@ export default function TestimonialsSection() {
                 {[...displayReviews, ...displayReviews].map((review, index) => (
                   <article
                     key={`${review.id}-${row}-${index}`}
-                    className="w-80 shrink-0 rounded-xl border border-border bg-card p-5"
+                    className="w-80 shrink-0 rounded-xl border border-border bg-card p-5 backdrop-blur-md"
                   >
                     <div className="text-accent-gold">
                       {"★".repeat(review.rating)}
                       {"☆".repeat(5 - review.rating)}
                     </div>
                     {review.comment ? (
-                      <p className="mt-3 text-sm leading-relaxed text-text-secondary">{review.comment}</p>
+                      <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+                        {review.comment}
+                      </p>
                     ) : null}
-                    <p className="mt-4 text-sm font-medium text-text-primary">{review.user.name}</p>
+                    <p className="mt-4 text-sm font-medium text-text-primary">
+                      {review.user.name}
+                    </p>
                     {review.product ? (
                       <Link
                         to={`/product/${review.product.slug}`}

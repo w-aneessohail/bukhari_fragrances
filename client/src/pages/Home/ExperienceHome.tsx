@@ -16,6 +16,10 @@ import HomeExperienceFooter from "../../components/home/HomeExperienceFooter";
 import ExperienceCursor from "../../components/ui/ExperienceCursor";
 import LoadingScreen from "../../components/ui/LoadingScreen";
 import { EXPERIENCE_TEXTURES, PRELOAD_MODELS } from "../../constants/experienceAssets";
+import { HOME_ROUTES } from "../../constants/homePages";
+import PageMeta from "../../components/seo/PageMeta";
+import JsonLd from "../../components/seo/JsonLd";
+import { buildOrganizationJsonLd } from "../../utils/jsonLd";
 import { detectWebGLSupport, type WebGLState } from "../../utils/webglSupport";
 
 const SCROLL_HEIGHT_VH = 1350;
@@ -111,6 +115,12 @@ export default function ExperienceHome() {
 
   return (
     <ScrollExperienceProvider value={scrollState}>
+      <PageMeta
+        title="Bukhari Perfumes — Luxury Fragrances from Lahore"
+        description="Discover oud, attar, and signature eau de parfum collections handcrafted by Bukhari Perfumes in Lahore."
+        path={HOME_ROUTES.experience}
+      />
+      <JsonLd data={buildOrganizationJsonLd()} />
       <LoadingScreen progress={loadProgress} visible={!assetsReady} />
 
       <div

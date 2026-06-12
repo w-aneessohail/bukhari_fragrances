@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import PageLoadingScreen from "../../../components/ui/PageLoadingScreen";
 import { fetchDashboardStats } from "../../../services/adminService";
 
 const pieColors = ["#B8860B", "#8B4513", "#333340", "#F5F0E8", "#1A1A2E", "#666", "#999", "#ccc"];
@@ -33,7 +34,7 @@ export default function AdminDashboardPage() {
   });
 
   if (isLoading || !stats) {
-    return <p className="text-text-secondary">Loading dashboard…</p>;
+    return <PageLoadingScreen label="Loading dashboard" />;
   }
 
   const kpiCards = [

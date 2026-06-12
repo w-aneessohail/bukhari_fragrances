@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import PageLoadingScreen from "../ui/PageLoadingScreen";
 import { fetchLoyaltySummary } from "../../services/loyaltyService";
 
 export default function LoyaltyPanel() {
@@ -8,7 +9,7 @@ export default function LoyaltyPanel() {
   });
 
   if (isLoading) {
-    return <div className="h-24 animate-pulse rounded-lg bg-bg-secondary" />;
+    return <PageLoadingScreen label="Loading rewards" />;
   }
 
   if (!data) {

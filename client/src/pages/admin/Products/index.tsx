@@ -11,6 +11,7 @@ import {
   type AdminProductInput
 } from "../../../services/adminProductService";
 import { fetchCategories } from "../../../services/productService";
+import PageLoadingScreen from "../../../components/ui/PageLoadingScreen";
 import type { ProductSummary } from "../../../types/product.types";
 
 function formatLabel(value: string) {
@@ -60,6 +61,10 @@ export default function AdminProductsPage() {
   });
 
   const products = response?.data ?? [];
+
+  if (isLoading) {
+    return <PageLoadingScreen label="Loading products" />;
+  }
 
   const handleCreate = async (input: AdminProductInput) => {
     await createMutation.mutateAsync(input);
@@ -144,10 +149,7 @@ export default function AdminProductsPage() {
         </div>
       ) : null}
 
-      {isLoading ? (
-        <p className="mt-8 text-text-secondary">Loading products…</p>
-      ) : (
-        <div className="mt-8 overflow-x-auto rounded-xl border border-border">
+      <div className="mt-8 overflow-x-auto rounded-xl border border-border">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-border bg-bg-secondary">
               <tr>
@@ -205,7 +207,6 @@ export default function AdminProductsPage() {
             </tbody>
           </table>
         </div>
-      )}
     </div>
   );
 }

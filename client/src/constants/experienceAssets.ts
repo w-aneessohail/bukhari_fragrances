@@ -16,7 +16,9 @@ export const EXPERIENCE_TEXTURES = {
   glassRoughness: "/others/rough_glass_seamless_texture.png",
   brandLabel: "/others/text_logo.png",
   brandIcon: "/others/icon.png",
+  brandIconBrown: "/others/icon_brown.png",
   brandIconWhite: "/others/icon_white.png",
+  heroBottle: "/others/bottle.png",
   mistWhite: "/others/mist_white.png",
   rosePetalAlpha: "/others/rose-petal.png",
   silkGold: "/others/silk_fabric_golden.png"

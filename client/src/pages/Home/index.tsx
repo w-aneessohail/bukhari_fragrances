@@ -1,18 +1,7 @@
-import PageMeta from "../../components/seo/PageMeta";
-import JsonLd from "../../components/seo/JsonLd";
-import { buildOrganizationJsonLd } from "../../utils/jsonLd";
-import ExperienceHome from "./ExperienceHome";
+import { Navigate } from "react-router-dom";
+import { ACTIVE_HOME_PATH } from "../../constants/homePages";
 
-export default function HomePage() {
-  return (
-    <>
-      <PageMeta
-        title="Bukhari Perfumes — Luxury Fragrances from Lahore"
-        description="Discover oud, attar, and signature eau de parfum collections handcrafted by Bukhari Perfumes in Lahore."
-        path="/"
-      />
-      <JsonLd data={buildOrganizationJsonLd()} />
-      <ExperienceHome />
-    </>
-  );
+/** Root `/` redirects to whichever homepage variant is active in homePages.ts */
+export default function HomeIndexRedirect() {
+  return <Navigate to={ACTIVE_HOME_PATH} replace />;
 }

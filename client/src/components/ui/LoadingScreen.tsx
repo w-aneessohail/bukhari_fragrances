@@ -4,9 +4,14 @@ import { EXPERIENCE_TEXTURES } from "../../constants/experienceAssets";
 type LoadingScreenProps = {
   progress: number;
   visible: boolean;
+  label?: string;
 };
 
-export default function LoadingScreen({ progress, visible }: LoadingScreenProps) {
+export default function LoadingScreen({
+  progress,
+  visible,
+  label = "Loading experience"
+}: LoadingScreenProps) {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
@@ -59,7 +64,7 @@ export default function LoadingScreen({ progress, visible }: LoadingScreenProps)
           />
         </div>
         <p className="mt-3 text-center text-[10px] uppercase tracking-[0.3em] text-white/35">
-          Loading experience
+          {label}
         </p>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { useCartDrawerStore } from "../../store/cartDrawerStore";
 import { useCartStore } from "../../store/cartStore";
+import PageLoadingScreen from "../ui/PageLoadingScreen";
 import CartLineItem from "./CartLineItem";
 
 export default function CartDrawer() {
@@ -82,7 +83,7 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-border bg-bg-primary shadow-luxury"
+            className="site-panel fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col rounded-none border-l border-border shadow-luxury"
           >
             <header className="flex items-center justify-between border-b border-border px-5 py-4">
               <div>
@@ -96,7 +97,7 @@ export default function CartDrawer() {
               <button
                 type="button"
                 onClick={close}
-                className="rounded border border-border px-3 py-1 text-sm text-text-secondary hover:text-accent-gold"
+                className="rounded border border-border px-3 py-1 text-sm text-text-secondary hover:border-accent-gold hover:text-accent-gold"
               >
                 Close
               </button>
@@ -104,11 +105,7 @@ export default function CartDrawer() {
 
             <div className="flex-1 overflow-y-auto px-5 py-4">
               {isLoading ? (
-                <div className="space-y-4">
-                  {Array.from({ length: 2 }).map((_, index) => (
-                    <div key={index} className="h-28 animate-pulse rounded-xl bg-bg-secondary" />
-                  ))}
-                </div>
+                <PageLoadingScreen label="Loading cart" />
               ) : cart.items.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center text-center">
                   <motion.div
@@ -152,7 +149,7 @@ export default function CartDrawer() {
                       value={discountCode}
                       onChange={(event) => setDiscountCode(event.target.value.toUpperCase())}
                       placeholder="Discount code"
-                      className="min-w-0 flex-1 rounded-md border border-border bg-input px-3 py-2 text-sm uppercase"
+                      className="min-w-0 flex-1 rounded-md border border-border bg-input px-3 py-2 text-sm uppercase text-text-primary"
                     />
                     <button
                       type="submit"

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { useCartStore } from "../../store/cartStore";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { fetchProductBySlug, fetchProducts } from "../../services/productService";
 
 const GIFT_NOTES_KEY = "bukhari_gift_notes";
@@ -81,6 +82,10 @@ export default function GiftBuilderPage() {
     }
   };
 
+  if (isLoading) {
+    return <PageLoadingScreen label="Loading fragrances" />;
+  }
+
   return (
     <section className="mx-auto max-w-4xl px-4 py-10 md:px-6">
       <h1 className="font-heading text-4xl text-accent-gold">Gift builder</h1>
@@ -99,10 +104,7 @@ export default function GiftBuilderPage() {
         />
       </label>
 
-      {isLoading ? (
-        <p className="mt-8 text-text-secondary">Loading fragrances…</p>
-      ) : (
-        <ul className="mt-8 space-y-3">
+      <ul className="mt-8 space-y-3">
           {products.map((product) => (
             <li key={product.id}>
               <label className="flex cursor-pointer items-center gap-4 rounded-xl border border-border bg-card p-4">
@@ -127,7 +129,6 @@ export default function GiftBuilderPage() {
             </li>
           ))}
         </ul>
-      )}
 
       {status ? <p className="mt-4 text-sm text-red-500">{status}</p> : null}
 

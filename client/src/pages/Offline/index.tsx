@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import PageMeta from "../../components/seo/PageMeta";
+import { ACTIVE_HOME_PATH } from "../../constants/homePages";
 
 export default function OfflinePage() {
   return (
@@ -10,7 +11,7 @@ export default function OfflinePage() {
         Bukhari Perfumes needs an internet connection for live stock and checkout. Browse cached pages or try again
         shortly.
       </p>
-      <Link to="/" className="mt-8 rounded-lg bg-accent-gold px-6 py-3 font-medium text-bg-primary">
+      <Link to={ACTIVE_HOME_PATH} className="mt-8 rounded-lg bg-accent-gold px-6 py-3 font-medium text-bg-primary">
         Back to home
       </Link>
     </section>

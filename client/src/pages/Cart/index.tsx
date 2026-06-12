@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import CartLineItem from "../../components/cart/CartLineItem";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { useAuthStore } from "../../store/authStore";
 import { useCartStore } from "../../store/cartStore";
 
@@ -46,16 +47,7 @@ export default function CartPage() {
   };
 
   if (isLoading) {
-    return (
-      <section className="mx-auto max-w-4xl px-4 py-10 md:px-6">
-        <div className="h-10 w-48 animate-pulse rounded bg-bg-secondary" />
-        <div className="mt-8 space-y-4">
-          {Array.from({ length: 2 }).map((_, index) => (
-            <div key={index} className="h-32 animate-pulse rounded-xl bg-bg-secondary" />
-          ))}
-        </div>
-      </section>
-    );
+    return <PageLoadingScreen label="Loading cart" />;
   }
 
   return (

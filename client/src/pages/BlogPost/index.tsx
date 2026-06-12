@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { fetchBlogPost } from "../../services/blogService";
 
 export default function BlogPostPage() {
@@ -12,12 +13,7 @@ export default function BlogPostPage() {
   });
 
   if (isLoading) {
-    return (
-      <section className="mx-auto max-w-3xl px-4 py-16 md:px-6">
-        <div className="h-10 w-2/3 animate-pulse rounded bg-bg-secondary" />
-        <div className="mt-8 h-64 animate-pulse rounded-xl bg-bg-secondary" />
-      </section>
-    );
+    return <PageLoadingScreen label="Loading article" />;
   }
 
   if (isError || !post) {

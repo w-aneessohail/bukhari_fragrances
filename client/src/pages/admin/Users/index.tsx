@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import PageLoadingScreen from "../../../components/ui/PageLoadingScreen";
 import { fetchAdminUsers } from "../../../services/adminService";
 
 export default function AdminUsersPage() {
@@ -9,15 +10,16 @@ export default function AdminUsersPage() {
 
   const users = response?.data ?? [];
 
+  if (isLoading) {
+    return <PageLoadingScreen label="Loading customers" />;
+  }
+
   return (
     <div>
       <h1 className="font-heading text-3xl text-accent-gold">Customers</h1>
       <p className="mt-2 text-text-secondary">Registered accounts on Bukhari Perfumes.</p>
 
-      {isLoading ? (
-        <p className="mt-8 text-text-secondary">Loading users…</p>
-      ) : (
-        <div className="mt-8 overflow-x-auto rounded-xl border border-border">
+      <div className="mt-8 overflow-x-auto rounded-xl border border-border">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-border bg-bg-secondary">
               <tr>
@@ -42,7 +44,6 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
-      )}
     </div>
   );
 }

@@ -6,7 +6,8 @@ const config: Config = {
     extend: {
       fontFamily: {
         heading: ["Cormorant Garamond", "serif"],
-        body: ["Inter", "sans-serif"]
+        body: ["Inter", "sans-serif"],
+        brand: ["Delmon Delicate", "Cormorant Garamond", "serif"]
       },
       colors: {
         bg: {

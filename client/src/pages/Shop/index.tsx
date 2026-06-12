@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import FilterSidebar from "../../components/shop/FilterSidebar";
 import ProductCard from "../../components/product/ProductCard";
+import PageLoadingScreen from "../../components/ui/PageLoadingScreen";
 import { fetchCategories, fetchProducts, searchProducts } from "../../services/productService";
 
 export default function ShopPage() {
@@ -65,6 +66,10 @@ export default function ShopPage() {
 
   const products = productsResponse?.data ?? [];
   const pagination = productsResponse?.pagination;
+
+  if (isLoading) {
+    return <PageLoadingScreen label="Loading shop" />;
+  }
 
   const updateFilter = (key: string, value: string | boolean | undefined) => {
     const next = new URLSearchParams(searchParams);
@@ -138,21 +143,13 @@ export default function ShopPage() {
             Showing {products.length} of {pagination?.totalItems ?? products.length} perfumes
           </p>
 
-          {isLoading ? (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="h-80 animate-pulse rounded-xl bg-bg-secondary" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
 
-          {!isLoading && products.length === 0 ? (
+          {products.length === 0 ? (
             <p className="mt-8 text-center text-text-secondary">
               {searchQuery ? "No fragrances matched your search." : "No products match your filters."}
             </p>
