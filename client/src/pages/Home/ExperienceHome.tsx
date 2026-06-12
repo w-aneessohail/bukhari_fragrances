@@ -18,7 +18,7 @@ import LoadingScreen from "../../components/ui/LoadingScreen";
 import { EXPERIENCE_TEXTURES, PRELOAD_MODELS } from "../../constants/experienceAssets";
 import { detectWebGLSupport, type WebGLState } from "../../utils/webglSupport";
 
-const SCROLL_HEIGHT_VH = 760;
+const SCROLL_HEIGHT_VH = 1350;
 
 if (typeof document !== "undefined" && detectWebGLSupport()) {
   PRELOAD_MODELS.forEach((url) => useGLTF.preload(url));
@@ -59,12 +59,7 @@ export default function ExperienceHome() {
       return undefined;
     }
 
-    const textureUrls = [
-      EXPERIENCE_TEXTURES.hdri,
-      EXPERIENCE_TEXTURES.sandDiffuse,
-      EXPERIENCE_TEXTURES.brandLabel,
-      EXPERIENCE_TEXTURES.mistWhite
-    ];
+    const textureUrls = [EXPERIENCE_TEXTURES.hdri, EXPERIENCE_TEXTURES.glassRoughness];
 
     const totalItems = PRELOAD_MODELS.length + textureUrls.length;
     let loadedItems = 0;

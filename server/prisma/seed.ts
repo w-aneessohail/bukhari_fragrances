@@ -298,6 +298,23 @@ async function main() {
     }
   });
 
+  const reviewerUser = await prisma.user.upsert({
+    where: { email: "fatima.reviews@bukhariperfumes.local" },
+    update: {
+      name: "Fatima S.",
+      role: "CUSTOMER",
+      passwordHash: customerPasswordHash,
+      isVerified: true
+    },
+    create: {
+      email: "fatima.reviews@bukhariperfumes.local",
+      name: "Fatima S.",
+      role: "CUSTOMER",
+      passwordHash: customerPasswordHash,
+      isVerified: true
+    }
+  });
+
   const customerUser = await prisma.user.upsert({
     where: { email: "customer@bukhariperfumes.local" },
     update: {
@@ -477,6 +494,7 @@ async function main() {
 
   const oudProduct = await prisma.product.findUnique({ where: { slug: "bukhari-oud-royale" } });
   const roseProduct = await prisma.product.findUnique({ where: { slug: "rosewood-attar" } });
+  const jasmineProduct = await prisma.product.findUnique({ where: { slug: "jasmine-dusk" } });
 
   if (oudProduct) {
     await prisma.review.upsert({
@@ -518,6 +536,28 @@ async function main() {
         comment: "Rosewood Attar is elegant and beautifully balanced for Lahore evenings.",
         isVerified: true,
         helpfulCount: 8
+      }
+    });
+  }
+
+  if (jasmineProduct) {
+    await prisma.review.upsert({
+      where: {
+        userId_productId: { userId: reviewerUser.id, productId: jasmineProduct.id }
+      },
+      update: {
+        rating: 5,
+        comment: "Jasmine Dusk is divine — soft, elegant, and lasts all day on fabric.",
+        isVerified: true,
+        helpfulCount: 6
+      },
+      create: {
+        userId: reviewerUser.id,
+        productId: jasmineProduct.id,
+        rating: 5,
+        comment: "Jasmine Dusk is divine — soft, elegant, and lasts all day on fabric.",
+        isVerified: true,
+        helpfulCount: 6
       }
     });
   }

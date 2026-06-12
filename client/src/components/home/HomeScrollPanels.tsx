@@ -4,17 +4,15 @@ import { useScrollExperience } from "../../context/ScrollExperienceContext";
 import {
   categoriesPanelOpacity,
   isInSection,
-  notesPanelOpacity,
-  popularPanelOpacity,
   sectionProgress
 } from "../../constants/scrollSections";
-import { fetchBestsellerProducts, fetchCategories } from "../../services/productService";
+import { fetchCategories } from "../../services/productService";
+import HomeCraftPanel from "./HomeCraftPanel";
+import HomeHeritagePanel from "./HomeHeritagePanel";
 import HomeNotesPanel from "./HomeNotesPanel";
+import HomePopularPanel from "./HomePopularPanel";
 import HomeReviewsPanel from "./HomeReviewsPanel";
-
-function formatPrice(amount: number) {
-  return `PKR ${amount.toLocaleString("en-PK")}`;
-}
+import HomeRitualPanel from "./HomeRitualPanel";
 
 const FALLBACK_CATEGORIES = [
   {
@@ -37,58 +35,15 @@ const FALLBACK_CATEGORIES = [
   }
 ];
 
-function Panel({
-  visible,
-  children
-}: {
-  visible: boolean;
-  children: React.ReactNode;
-}) {
+function Panel({ visible, children }: { visible: boolean; children: React.ReactNode }) {
   return (
     <div
-      className={`pointer-events-none absolute inset-0 z-20 transition-all duration-1000 ${
+      className={`pointer-events-none absolute inset-0 z-20 ${
         visible ? "opacity-100" : "opacity-0"
       }`}
     >
       {children}
     </div>
-  );
-}
-
-function ProductCard({
-  product,
-  align
-}: {
-  product: {
-    name: string;
-    slug: string;
-    mainImage: string | null;
-    price: number;
-    salePrice: number | null;
-    scentFamily?: string;
-  };
-  align: "left" | "right";
-}) {
-  return (
-    <Link
-      to={`/product/${product.slug}`}
-      className={`pointer-events-auto block w-52 border border-white/15 bg-black/50 p-4 backdrop-blur-md transition hover:border-[#D4AF37]/50 md:w-64 lg:w-72 ${
-        align === "left" ? "mr-auto" : "ml-auto"
-      }`}
-    >
-      {product.mainImage ? (
-        <img src={product.mainImage} alt={product.name} className="mb-4 h-36 w-full object-cover md:h-40" />
-      ) : (
-        <div className="mb-4 flex h-36 items-center justify-center bg-white/5 text-[10px] uppercase tracking-widest text-white/30 md:h-40">
-          Bukhari
-        </div>
-      )}
-      <p className="font-serif text-base text-white md:text-lg">{product.name}</p>
-      {product.scentFamily ? (
-        <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/45">{product.scentFamily}</p>
-      ) : null}
-      <p className="mt-3 text-sm text-[#D4AF37]">{formatPrice(product.salePrice ?? product.price)}</p>
-    </Link>
   );
 }
 
@@ -101,25 +56,12 @@ export default function HomeScrollPanels() {
     staleTime: 60_000
   });
 
-  const { data: bestsellers = [] } = useQuery({
-    queryKey: ["home-bestsellers"],
-    queryFn: fetchBestsellerProducts,
-    staleTime: 60_000
-  });
-
-  const products = bestsellers.length > 0 ? bestsellers : [];
-  const popularPair = [products[0], products[1]].filter(Boolean);
-
   const heroVisible = isInSection(progress, "HERO");
-
   const heroT = sectionProgress(progress, "HERO");
   const categoriesOp = categoriesPanelOpacity(progress);
-  const popularOp = popularPanelOpacity(progress);
-  const notesOp = notesPanelOpacity(progress);
 
   return (
     <>
-      {/* Screen 1 — hero text high left, bottle far right */}
       <Panel visible={heroVisible}>
         <div
           className="flex h-full items-start px-6 pt-28 md:px-14 md:pt-32 lg:px-20 lg:pt-36"
@@ -132,20 +74,17 @@ export default function HomeScrollPanels() {
               <br />
               <span className="font-serif italic text-[#D4AF37]">see, feel, wear.</span>
             </h1>
+            <p className="mt-6 text-sm uppercase tracking-[0.35em] text-white/35">Lahore · Pakistan</p>
           </div>
         </div>
       </Panel>
 
-      {/* Screen 2 — categories right, fully visible by 20% scroll */}
       <div
         className="pointer-events-none absolute inset-0 z-20"
         style={{ opacity: categoriesOp, visibility: categoriesOp > 0.01 ? "visible" : "hidden" }}
       >
         <div className="flex h-full items-center justify-end px-6 md:px-14 lg:px-20">
-          <div
-            className="pointer-events-auto w-full max-w-sm"
-            style={{ color: categoriesOp >= 1 ? "#ffffff" : undefined }}
-          >
+          <div className="pointer-events-auto w-full max-w-sm">
             <p className="text-[10px] uppercase tracking-[0.35em] text-white">Collections</p>
             <h2 className="mt-3 font-sans text-2xl font-light text-white md:text-4xl">Categories we craft</h2>
             <div className="mt-6 space-y-2">
@@ -156,7 +95,7 @@ export default function HomeScrollPanels() {
                   className="group flex items-center gap-3 border-b border-white/15 py-3 transition hover:border-[#D4AF37]/40"
                 >
                   {category.image ? (
-                    <img src={category.image} alt={category.name} className="h-11 w-11 object-cover" />
+                    <img src={category.image} alt={category.name} className="h-11 w-11 object-cover" loading="lazy" />
                   ) : (
                     <div className="h-11 w-11 bg-white/5" />
                   )}
@@ -173,29 +112,12 @@ export default function HomeScrollPanels() {
         </div>
       </div>
 
-      {/* Screen 3 — petal center, larger products left & right */}
-      <div
-        className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-700"
-        style={{ opacity: popularOp, visibility: popularOp > 0.01 ? "visible" : "hidden" }}
-      >
-        <div className="flex h-full items-center px-4 md:px-8 lg:px-12">
-          <div className="flex w-full items-center justify-between gap-2">
-            <div className="w-[30%] max-w-[18rem]">
-              {popularPair[0] ? <ProductCard product={popularPair[0]} align="left" /> : null}
-            </div>
-            <div className="w-[30%] max-w-[18rem]">
-              {popularPair[1] ? <ProductCard product={popularPair[1]} align="right" /> : null}
-            </div>
-          </div>
-        </div>
-        <p className="pointer-events-none absolute bottom-16 left-1/2 -translate-x-1/2 text-center font-serif text-2xl tracking-[0.15em] text-white md:bottom-20 md:text-4xl lg:text-5xl">
-          Most Loved
-        </p>
-      </div>
-
-      {/* Screen 4 — notes left, reviews right, synced with floral swap */}
-      <HomeNotesPanel opacity={notesOp} />
-      <HomeReviewsPanel opacity={notesOp} />
+      <HomePopularPanel />
+      <HomeHeritagePanel />
+      <HomeCraftPanel />
+      <HomeRitualPanel />
+      <HomeNotesPanel />
+      <HomeReviewsPanel />
     </>
   );
 }

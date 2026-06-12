@@ -94,7 +94,7 @@ function ProductCard({ product }: { product: ShowcaseProduct }) {
 
 export default function HomeFooterShowcase() {
   const { data: products = [] } = useQuery({
-    queryKey: ["footer-showcase-products"],
+    queryKey: ["home-bestsellers"],
     queryFn: fetchBestsellerProducts,
     staleTime: 60_000
   });

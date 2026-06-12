@@ -1,15 +1,28 @@
 export const SECTIONS = {
-  HERO: { start: 0, end: 0.11 },
-  CATEGORIES: { start: 0.11, end: 0.3 },
-  POPULAR: { start: 0.3, end: 0.52 },
-  NOTES: { start: 0.52, end: 0.79 },
-  STORY: { start: 0.79, end: 0.96 }
+  HERO: { start: 0, end: 0.07 },
+  CATEGORIES: { start: 0.07, end: 0.17 },
+  POPULAR: { start: 0.17, end: 0.35 },
+  HERITAGE: { start: 0.35, end: 0.45 },
+  CRAFT: { start: 0.45, end: 0.53 },
+  RITUAL: { start: 0.53, end: 0.63 },
+  NOTES: { start: 0.63, end: 0.86 },
+  STORY: { start: 0.86, end: 0.97 }
 } as const;
 
 export type SectionKey = keyof typeof SECTIONS;
 
-export const CATEGORIES_TEXT_FULL_AT = 0.16;
+export const CATEGORIES_TEXT_FULL_AT = 0.12;
 export const CATEGORIES_MOVE_END = 0.5;
+
+export const POPULAR_BEAT_COUNT = 3;
+export const CRAFT_BEAT_COUNT = 3;
+export const NOTES_BEAT_COUNT = 3;
+export const HERITAGE_BEAT_COUNT = 3;
+export const RITUAL_BEAT_COUNT = 3;
+
+/** Each beat: long hold at full opacity, short crossfade, then next beat snaps to full. */
+export const BEAT_HOLD_RATIO = 0.86;
+export const BEAT_FADE_RATIO = 0.14;
 
 export function isInSection(progress: number, section: SectionKey) {
   const { start, end } = SECTIONS[section];
@@ -45,7 +58,7 @@ export function categoriesTextOpacity(progress: number) {
 }
 
 export function categoriesPanelOpacity(progress: number) {
-  const fadeOutStart = 0.275;
+  const fadeOutStart = SECTIONS.POPULAR.start - 0.015;
   const fadeOutEnd = SECTIONS.CATEGORIES.end;
   if (progress < SECTIONS.CATEGORIES.start || progress >= fadeOutEnd) return 0;
 
@@ -56,42 +69,92 @@ export function categoriesPanelOpacity(progress: number) {
   return textOp * (1 - Math.min(1, fadeT));
 }
 
-export function popularPanelOpacity(progress: number) {
-  const fadeInStart = SECTIONS.POPULAR.start;
-  const fadeInEnd = SECTIONS.POPULAR.start + 0.025;
-  const fadeOutStart = SECTIONS.POPULAR.end - 0.07;
-  if (progress < fadeInStart) return 0;
-  if (progress >= SECTIONS.POPULAR.end) return 0;
-  if (progress < fadeInEnd) return (progress - fadeInStart) / (fadeInEnd - fadeInStart);
-  if (progress >= fadeOutStart) {
-    return 1 - (progress - fadeOutStart) / (SECTIONS.POPULAR.end - fadeOutStart);
+export function sectionBeat(progress: number, section: SectionKey, count: number) {
+  const local = sectionProgress(progress, section);
+  const scaled = local * count;
+  const index = Math.min(count - 1, Math.floor(scaled));
+  const blend = scaled - index;
+  return { index, blend, local };
+}
+
+export type BeatSlotVisual = { opacity: number; slide: number };
+
+/**
+ * Scroll-linked beat visibility — long hold, quick crossfade, incoming reaches full opacity
+ * as soon as the handoff completes (no extra scroll to "finish" fading in).
+ */
+export function beatSlotVisual(
+  sectionLocal: number,
+  slotIndex: number,
+  slotCount: number
+): BeatSlotVisual {
+  const hold = BEAT_HOLD_RATIO;
+  const fade = BEAT_FADE_RATIO;
+  const pos = sectionLocal * slotCount;
+  const dist = pos - slotIndex;
+
+  if (dist >= 0 && dist < 1) {
+    if (dist <= hold) return { opacity: 1, slide: 0 };
+    const t = Math.min(1, (dist - hold) / fade);
+    return { opacity: 1 - t, slide: t };
   }
+
+  if (slotIndex > 0) {
+    const prevDist = pos - (slotIndex - 1);
+    if (prevDist > hold && prevDist <= 1) {
+      const t = Math.min(1, (prevDist - hold) / fade);
+      const opacity = Math.min(1, t * 1.4);
+      return { opacity: opacity > 0.94 ? 1 : opacity, slide: 1 - opacity };
+    }
+  }
+
+  if (slotIndex === 0 && pos >= 0 && pos < hold / slotCount + fade / slotCount) {
+    return { opacity: 1, slide: 0 };
+  }
+
+  return { opacity: 0, slide: 0 };
+}
+
+/** @deprecated Use beatSlotVisual — kept for simple opacity-only call sites */
+export function beatSlotOpacity(sectionLocal: number, slotIndex: number, slotCount: number) {
+  return beatSlotVisual(sectionLocal, slotIndex, slotCount).opacity;
+}
+
+function sectionPanelOpacity(section: SectionKey, progress: number, fadeIn = 0.025, fadeOut = 0.03) {
+  const { start, end } = SECTIONS[section];
+  const fadeInEnd = start + fadeIn;
+  const fadeOutStart = end - fadeOut;
+  if (progress < start) return 0;
+  if (progress >= end) return 0;
+  if (progress < fadeInEnd) return (progress - start) / (fadeInEnd - start);
+  if (progress >= fadeOutStart) return 1 - (progress - fadeOutStart) / (end - fadeOutStart);
   return 1;
+}
+
+export function popularPanelOpacity(progress: number) {
+  return sectionPanelOpacity("POPULAR", progress);
+}
+
+export function heritagePanelOpacity(progress: number) {
+  return sectionPanelOpacity("HERITAGE", progress);
+}
+
+export function craftPanelOpacity(progress: number) {
+  return sectionPanelOpacity("CRAFT", progress);
+}
+
+export function ritualPanelOpacity(progress: number) {
+  return sectionPanelOpacity("RITUAL", progress);
 }
 
 export function notesPanelOpacity(progress: number) {
-  const fadeInStart = SECTIONS.NOTES.start;
-  const fadeInEnd = SECTIONS.NOTES.start + 0.065;
-  const fadeOutStart = SECTIONS.NOTES.end - 0.025;
-  if (progress < fadeInStart) return 0;
-  if (progress >= SECTIONS.NOTES.end) return 0;
-  if (progress < fadeInEnd) return (progress - fadeInStart) / (fadeInEnd - fadeInStart);
-  if (progress >= fadeOutStart) {
-    return 1 - (progress - fadeOutStart) / (SECTIONS.NOTES.end - fadeOutStart);
-  }
-  return 1;
+  return sectionPanelOpacity("NOTES", progress, 0.03, 0.025);
 }
 
-/** Full-screen story — long hold so visitors can read comfortably. */
+export function reviewsPanelOpacity(progress: number) {
+  return notesPanelOpacity(progress);
+}
+
 export function storyPanelOpacity(progress: number) {
-  const fadeInStart = SECTIONS.STORY.start;
-  const fadeInEnd = SECTIONS.STORY.start + 0.015;
-  const fadeOutStart = SECTIONS.STORY.end - 0.02;
-  if (progress < fadeInStart) return 0;
-  if (progress >= SECTIONS.STORY.end) return 0;
-  if (progress < fadeInEnd) return (progress - fadeInStart) / (fadeInEnd - fadeInStart);
-  if (progress >= fadeOutStart) {
-    return 1 - (progress - fadeOutStart) / (SECTIONS.STORY.end - fadeOutStart);
-  }
-  return 1;
+  return sectionPanelOpacity("STORY", progress, 0.015, 0.02);
 }

@@ -2,7 +2,7 @@ import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
 import { Bloom, ChromaticAberration, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
-import { Suspense, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { Vector2 } from "three";
 import { useScrollExperience } from "../../context/ScrollExperienceContext";
 import { getCanvasOpacity } from "../../utils/scrollChoreography";
@@ -30,18 +30,24 @@ type SceneProps = {
 };
 
 export default function Scene({ onPerformanceChange, onReady }: SceneProps) {
-  const { isMobile, progress } = useScrollExperience();
-  const [dpr, setDpr] = useState(1.5);
+  const { isMobile, lowPerformance, progress } = useScrollExperience();
+  const [dpr, setDpr] = useState(() => (isMobile ? 1 : 1.25));
   const canvasOpacity = getCanvasOpacity(progress);
+  const reduceEffects = isMobile || lowPerformance;
+
+  const chromaticOffset = useMemo(
+    () => (reduceEffects ? new Vector2(0, 0) : new Vector2(0.0005, 0.0005)),
+    [reduceEffects]
+  );
 
   return (
     <div className="absolute inset-0 z-0 transition-opacity duration-700" style={{ opacity: canvasOpacity }}>
       <Canvas
-        shadows
+        shadows={!reduceEffects}
         dpr={dpr}
         camera={{ fov: 32, near: 0.1, far: 100, position: [-2.55, 0.32, 6.1] }}
         gl={{
-          antialias: true,
+          antialias: !reduceEffects,
           alpha: true,
           powerPreference: "high-performance",
           failIfMajorPerformanceCaveat: false
@@ -58,19 +64,24 @@ export default function Scene({ onPerformanceChange, onReady }: SceneProps) {
             onPerformanceChange?.(true);
           }}
           onIncline={() => {
-            setDpr(isMobile ? 1 : 1.5);
+            setDpr(isMobile ? 1 : 1.25);
             onPerformanceChange?.(false);
           }}
         />
         <Suspense fallback={null}>
           <SceneContent />
         </Suspense>
-        <EffectComposer>
-          <Bloom luminanceThreshold={0.55} intensity={0.65} mipmapBlur radius={0.7} />
-          <Vignette darkness={0.65} offset={0.3} />
+        <EffectComposer multisampling={reduceEffects ? 0 : 4}>
+          <Bloom
+            luminanceThreshold={0.58}
+            intensity={reduceEffects ? 0.35 : 0.55}
+            mipmapBlur
+            radius={0.6}
+          />
+          <Vignette darkness={0.6} offset={0.3} />
           <ChromaticAberration
             blendFunction={BlendFunction.NORMAL}
-            offset={isMobile ? new Vector2(0, 0) : new Vector2(0.0006, 0.0006)}
+            offset={chromaticOffset}
             radialModulation={false}
             modulationOffset={0}
           />

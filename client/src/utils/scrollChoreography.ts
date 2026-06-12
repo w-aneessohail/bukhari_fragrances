@@ -121,9 +121,50 @@ export function getFloralState(progress: number, time = 0): FloralState {
     };
   }
 
+  if (progress < SECTIONS.HERITAGE.end) {
+    return {
+      pinkFlowerOpacity: 1,
+      pinkFlowerY: POPULAR_FLORAL_Y + bob,
+      pinkFlowerScale: 1.35,
+      leafOpacity: 0,
+      leafY: 0,
+      leafScale: 0,
+      smokeIntensity: 0.52,
+      streamIntensity: 0.78
+    };
+  }
+
+  if (progress < SECTIONS.CRAFT.end) {
+    const t = sectionProgress(progress, "CRAFT");
+    return {
+      pinkFlowerOpacity: 1,
+      pinkFlowerY: POPULAR_FLORAL_Y + bob,
+      pinkFlowerScale: lerp(1.35, 1.4, easeOutCubic(t)),
+      leafOpacity: 0,
+      leafY: 0,
+      leafScale: 0,
+      smokeIntensity: lerp(0.52, 0.48, t),
+      streamIntensity: lerp(0.78, 0.62, t)
+    };
+  }
+
+  if (progress < SECTIONS.RITUAL.end) {
+    const t = sectionProgress(progress, "RITUAL");
+    return {
+      pinkFlowerOpacity: 1,
+      pinkFlowerY: POPULAR_FLORAL_Y + bob,
+      pinkFlowerScale: lerp(1.4, 1.42, t),
+      leafOpacity: 0,
+      leafY: 0,
+      leafScale: 0,
+      smokeIntensity: lerp(0.48, 0.55, t),
+      streamIntensity: lerp(0.62, 0.35, t)
+    };
+  }
+
   if (progress < SECTIONS.NOTES.end) {
     const notesT = sectionProgress(progress, "NOTES");
-    const swapEnd = 0.3;
+    const swapEnd = 0.28;
     const swapT = easeInOutCubic(Math.min(1, notesT / swapEnd));
     const notesBob = NOTES_FLORAL_Y + bob;
 
@@ -131,11 +172,11 @@ export function getFloralState(progress: number, time = 0): FloralState {
       return {
         pinkFlowerOpacity: lerp(1, 0, swapT),
         pinkFlowerY: lerp(POPULAR_FLORAL_Y + bob, 2.5, swapT),
-        pinkFlowerScale: lerp(1.35, 1.0, swapT),
+        pinkFlowerScale: lerp(1.42, 1.0, swapT),
         leafOpacity: swapT,
         leafY: lerp(-2.2, notesBob, swapT),
         leafScale: lerp(0.5, 1.25, swapT),
-        smokeIntensity: lerp(0.65, 0.9, swapT),
+        smokeIntensity: lerp(0.48, 0.85, swapT),
         streamIntensity: 0
       };
     }
@@ -147,8 +188,8 @@ export function getFloralState(progress: number, time = 0): FloralState {
       pinkFlowerScale: 1.0,
       leafOpacity: 1,
       leafY: notesBob,
-      leafScale: lerp(1.25, 1.3, easeOutCubic(holdT)),
-      smokeIntensity: lerp(0.9, 0.7, holdT),
+      leafScale: lerp(1.25, 1.35, easeOutCubic(holdT)),
+      smokeIntensity: lerp(0.85, 0.55, holdT),
       streamIntensity: 0
     };
   }
@@ -166,9 +207,20 @@ export function getEnvironmentBlend(progress: number) {
     const t = sectionProgress(progress, "POPULAR");
     return { void: 0.2, sand: 0.3, rose: lerp(0.2, 0.75, t), gold: 0.1 };
   }
+  if (progress < SECTIONS.HERITAGE.end) {
+    return { void: 0.16, sand: 0.18, rose: 0.72, gold: 0.14 };
+  }
+  if (progress < SECTIONS.CRAFT.end) {
+    const t = sectionProgress(progress, "CRAFT");
+    return { void: 0.15, sand: 0.18, rose: lerp(0.72, 0.65, t), gold: lerp(0.14, 0.22, t) };
+  }
+  if (progress < SECTIONS.RITUAL.end) {
+    const t = sectionProgress(progress, "RITUAL");
+    return { void: 0.13, sand: 0.16, rose: lerp(0.65, 0.5, t), gold: lerp(0.22, 0.35, t) };
+  }
   if (progress < SECTIONS.NOTES.end) {
     const t = sectionProgress(progress, "NOTES");
-    return { void: 0.12, sand: 0.15, rose: lerp(0.75, 0.35, t), gold: lerp(0.1, 0.5, t) };
+    return { void: 0.1, sand: 0.12, rose: lerp(0.5, 0.15, t), gold: lerp(0.35, 0.65, t) };
   }
   if (progress < SECTIONS.STORY.end) {
     const t = sectionProgress(progress, "STORY");
@@ -184,10 +236,10 @@ export function getGroundOpacity(progress: number) {
   }
   if (progress < SECTIONS.POPULAR.end) return 0.45;
   if (progress < SECTIONS.NOTES.end) {
-    return lerp(0.45, 0.2, sectionProgress(progress, "NOTES"));
+    return lerp(0.45, 0.15, sectionProgress(progress, "NOTES"));
   }
   if (progress < SECTIONS.STORY.start + 0.04) {
-    return lerp(0.2, 0, (progress - SECTIONS.NOTES.end) / 0.04);
+    return lerp(0.15, 0, (progress - SECTIONS.NOTES.end) / 0.04);
   }
   return 0;
 }

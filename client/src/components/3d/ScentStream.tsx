@@ -12,9 +12,9 @@ import { getFloralState } from "../../utils/scrollChoreography";
 
 
 
-const COUNT = 500;
+const COUNT = 360;
 
-const NOTES_COUNT = 900;
+const NOTES_COUNT = 520;
 const NOTES_MIST_WIDTH = 0.38;
 const NOTES_MIST_DEPTH = 0.2;
 
@@ -26,9 +26,9 @@ function PopularStream() {
 
   const pointsRef = useRef<THREE.Points>(null);
 
-  const { progress, isMobile } = useScrollExperience();
+  const { progress, isMobile, lowPerformance } = useScrollExperience();
 
-  const count = isMobile ? COUNT / 2 : COUNT;
+  const count = lowPerformance || isMobile ? COUNT / 2 : COUNT;
 
 
 
@@ -110,9 +110,13 @@ function PopularStream() {
 
     const floral = getFloralState(progress, state.clock.elapsedTime);
 
-    const inPopular = isInSection(progress, "POPULAR");
+    const inStream =
+      isInSection(progress, "POPULAR") ||
+      isInSection(progress, "HERITAGE") ||
+      isInSection(progress, "CRAFT") ||
+      isInSection(progress, "RITUAL");
 
-    const intensity = inPopular ? floral.streamIntensity : 0;
+    const intensity = inStream ? floral.streamIntensity : 0;
 
     points.visible = intensity > 0.02;
 
@@ -180,9 +184,9 @@ function NotesRiseMist() {
 
   const pointsRef = useRef<THREE.Points>(null);
 
-  const { progress, isMobile } = useScrollExperience();
+  const { progress, isMobile, lowPerformance } = useScrollExperience();
 
-  const count = isMobile ? NOTES_COUNT / 2 : NOTES_COUNT;
+  const count = lowPerformance || isMobile ? NOTES_COUNT / 2 : NOTES_COUNT;
 
 
 
@@ -258,11 +262,11 @@ function NotesRiseMist() {
 
 
 
-    const inNotes = isInSection(progress, "NOTES");
+    const inMist = isInSection(progress, "NOTES");
 
     const floral = getFloralState(progress, state.clock.elapsedTime);
 
-    const intensity = inNotes ? Math.max(0.5, floral.smokeIntensity) : 0;
+    const intensity = inMist ? Math.max(0.5, floral.smokeIntensity) : 0;
 
     points.visible = intensity > 0.02;
 
